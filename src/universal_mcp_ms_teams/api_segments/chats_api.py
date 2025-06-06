@@ -39,7 +39,7 @@ class ChatsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            chats.chat
+            chats.chat, important
         """
         url = f"{self.main_app_client.base_url}/chats"
         query_params = {
@@ -1825,7 +1825,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_hosted_contents(
+    def count_chat_msg_hosted_contents(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -4416,7 +4416,7 @@ class ChatsApi(APISegmentBase):
             self.get_chat_msg_hosted_content_val,
             self.update_chat_hosted_content_val,
             self.del_chat_msg_host_content_val,
-            self.count_hosted_contents,
+            self.count_chat_msg_hosted_contents,
             self.set_chat_message_reaction,
             self.delete_message_softly,
             self.restore_soft_deleted_message,

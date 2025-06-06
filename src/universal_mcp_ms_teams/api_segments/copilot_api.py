@@ -29,7 +29,7 @@ class CopilotApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            copilot.aiUser
+            copilot.aiUser, important
         """
         if aiUser_id is None:
             raise ValueError("Missing required parameter 'aiUser-id'.")

@@ -582,7 +582,7 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team
+            teams.team, important
         """
         if team_id is None:
             raise ValueError("Missing required parameter 'team-id'.")
@@ -1948,7 +1948,7 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_channel_member(
+    def add_channel_members_bulk(
         self, team_id: str, channel_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
@@ -3836,7 +3836,7 @@ class TeamsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_hosted_contents(
+    def count_ch_msg_reply_host_contents(
         self,
         team_id: str,
         channel_id: str,
@@ -7366,7 +7366,7 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_member(
+    def add_team_members_bulk(
         self, team_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
@@ -7612,7 +7612,7 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_member(
+    def add_primary_channel_member(
         self,
         team_id: str,
         atodata_type: str,
@@ -15336,7 +15336,7 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team.Functions
+            teams.team.Functions, important
         """
         url = f"{self.main_app_client.base_url}/teams/getAllMessages()"
         query_params = {
@@ -15399,7 +15399,7 @@ class TeamsApi(APISegmentBase):
             self.teams_channels_update_members,
             self.teams_channels_delete_members,
             self.get_team_channel_members_count,
-            self.add_team_channel_member,
+            self.add_channel_members_bulk,
             self.remove_member_from_channel,
             self.teams_channels_list_messages,
             self.teams_channels_create_messages,
@@ -15432,7 +15432,7 @@ class TeamsApi(APISegmentBase):
             self.get_ch_msg_reply_hosted_content_val,
             self.update_msg_reply_hosted_content,
             self.delete_hosted_content_value,
-            self.count_hosted_contents,
+            self.count_ch_msg_reply_host_contents,
             self.set_reaction_to_reply,
             self.soft_delete_reply,
             self.undo_soft_delete_reply,
@@ -15512,14 +15512,14 @@ class TeamsApi(APISegmentBase):
             self.update_primary_channel_members,
             self.remove_conversation_member,
             self.count_team_primary_channel_members,
-            self.add_team_member,
+            self.add_team_members_bulk,
             self.remove_primary_channel_member,
             self.get_files_folder,
             self.get_team_primary_channel_content,
             self.upload_team_folder_content,
             self.delete_team_files_folder_content,
             self.list_primary_channel_members,
-            self.add_team_member,
+            self.add_primary_channel_member,
             self.get_team_members,
             self.update_team_member,
             self.delete_team_primary_channel_member,

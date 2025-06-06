@@ -39,7 +39,7 @@ class MeApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            me.onlineMeeting
+            me.onlineMeeting, important
         """
         url = f"{self.main_app_client.base_url}/me/onlineMeetings"
         query_params = {
@@ -900,7 +900,7 @@ class MeApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_attendance_record(
+    def deletemy_attendance_record(
         self,
         onlineMeeting_id: str,
         meetingAttendanceReport_id: str,
@@ -1691,7 +1691,7 @@ class MeApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_transcript(
+    def create_transcript_me(
         self,
         onlineMeeting_id: str,
         atodata_type: str,
@@ -2521,7 +2521,7 @@ class MeApi(APISegmentBase):
             self.create_attendance_record,
             self.get_attendance_record,
             self.update_attendance_record,
-            self.delete_attendance_record,
+            self.deletemy_attendance_record,
             self.get_attendance_count,
             self.get_online_meeting_attend_count,
             self.get_attendee_report,
@@ -2541,7 +2541,7 @@ class MeApi(APISegmentBase):
             self.count_online_meeting_recordings,
             self.get_my_meeting_recordings_delta,
             self.get_online_meeting_transcripts,
-            self.create_transcript,
+            self.create_transcript_me,
             self.get_call_transcript_by_id,
             self.update_transcript,
             self.delete_transcript_by_id,

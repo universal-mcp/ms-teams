@@ -810,7 +810,7 @@ class EmployeeexperienceApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_learning_course_activity(
+    def update_prov_course_activity_by_id(
         self,
         learningProvider_id: str,
         learningCourseActivity_id: str,
@@ -940,7 +940,7 @@ class EmployeeexperienceApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_learning_course_activity(
+    def update_prov_course_actvty_by_ext_id(
         self,
         learningProvider_id: str,
         externalcourseActivityId: str,
@@ -2605,10 +2605,10 @@ class EmployeeexperienceApi(APISegmentBase):
             self.list_learning_course_activities,
             self.create_learning_course_activity,
             self.get_prov_learn_course_activity,
-            self.update_learning_course_activity,
+            self.update_prov_course_activity_by_id,
             self.delete_learning_course_activity,
             self.get_provider_course_activity,
-            self.update_learning_course_activity,
+            self.update_prov_course_actvty_by_ext_id,
             self.delete_learning_activity_by_ext,
             self.count_learning_course_activities,
             self.count_learning_providers,

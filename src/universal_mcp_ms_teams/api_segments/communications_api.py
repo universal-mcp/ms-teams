@@ -4564,7 +4564,7 @@ class CommunicationsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_attendance_record(
+    def deletecomm_attendance_record(
         self,
         onlineMeeting_id: str,
         meetingAttendanceReport_id: str,
@@ -5357,7 +5357,7 @@ class CommunicationsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_transcript(
+    def create_transcript_comm(
         self,
         onlineMeeting_id: str,
         atodata_type: str,
@@ -6558,7 +6558,7 @@ class CommunicationsApi(APISegmentBase):
             self.add_attendance_record,
             self.get_attendance_record_details,
             self.update_attendance_record_by_id,
-            self.delete_attendance_record,
+            self.deletecomm_attendance_record,
             self.get_attendance_records_count,
             self.get_meeting_attendance_count,
             self.get_attendee_report_by_meeting_id,
@@ -6578,7 +6578,7 @@ class CommunicationsApi(APISegmentBase):
             self.count_recordings,
             self.get_comm_meeting_recordings_delta,
             self.get_online_meeting_transcript,
-            self.create_transcript,
+            self.create_transcript_comm,
             self.get_transcript_data,
             self.patch_transcript,
             self.delete_transcript,

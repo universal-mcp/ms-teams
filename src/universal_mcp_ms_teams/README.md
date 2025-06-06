@@ -1,10 +1,10 @@
-# MsteamsApp MCP Server
+# MsTeamsApp MCP Server
 
-An MCP Server for the MsteamsApp API.
+An MCP Server for the MsTeamsApp API.
 
 ## 🛠️ Tool List
 
-This is automatically generated from OpenAPI schema for the MsteamsApp API.
+This is automatically generated from OpenAPI schema for the MsTeamsApp API.
 
 
 | Tool | Description |
@@ -63,7 +63,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `teams_channels_update_members` | Update conversationMember |
 | `teams_channels_delete_members` | Remove member from channel |
 | `get_team_channel_members_count` | Get the number of the resource |
-| `add_team_channel_member` | Invoke action add |
+| `add_channel_members_bulk` | Invoke action add |
 | `remove_member_from_channel` | Invoke action remove |
 | `teams_channels_list_messages` | List channel messages |
 | `teams_channels_create_messages` | Send chatMessage in channel |
@@ -96,7 +96,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `get_ch_msg_reply_hosted_content_val` | List hostedContents |
 | `update_msg_reply_hosted_content` | Update media content for the navigation property hostedContents in teams |
 | `delete_hosted_content_value` | Delete media content for the navigation property hostedContents in teams |
-| `count_hosted_contents` | Get the number of the resource |
+| `count_ch_msg_reply_host_contents` | Get the number of the resource |
 | `set_reaction_to_reply` | Invoke action setReaction |
 | `soft_delete_reply` | Invoke action softDelete |
 | `undo_soft_delete_reply` | Invoke action undoSoftDelete |
@@ -176,14 +176,14 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `update_primary_channel_members` | Update the navigation property allMembers in teams |
 | `remove_conversation_member` | Delete navigation property allMembers for teams |
 | `count_team_primary_channel_members` | Get the number of the resource |
-| `add_team_member` | Create new navigation property to members for teams |
+| `add_team_members_bulk` | Invoke action add |
 | `remove_primary_channel_member` | Invoke action remove |
 | `get_files_folder` | Get filesFolder from teams |
 | `get_team_primary_channel_content` | Get content for the navigation property filesFolder from teams |
 | `upload_team_folder_content` | Update content for the navigation property filesFolder in teams |
 | `delete_team_files_folder_content` | Delete content for the navigation property filesFolder in teams |
 | `list_primary_channel_members` | Get members from teams |
-| `add_team_member` | Create new navigation property to members for teams |
+| `add_primary_channel_member` | Create new navigation property to members for teams |
 | `get_team_members` | Get members from teams |
 | `update_team_member` | Update the navigation property members in teams |
 | `delete_team_primary_channel_member` | Delete navigation property members for teams |
@@ -387,7 +387,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `get_chat_msg_hosted_content_val` | List hostedContents |
 | `update_chat_hosted_content_val` | Update media content for the navigation property hostedContents in chats |
 | `del_chat_msg_host_content_val` | Delete media content for the navigation property hostedContents in chats |
-| `count_hosted_contents` | Get the number of the resource |
+| `count_chat_msg_hosted_contents` | Get the number of the resource |
 | `set_chat_message_reaction` | Invoke action setReaction |
 | `delete_message_softly` | Invoke action softDelete |
 | `restore_soft_deleted_message` | Invoke action undoSoftDelete |
@@ -456,7 +456,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `create_attendance_record` | Create new navigation property to attendanceRecords for me |
 | `get_attendance_record` | Get attendanceRecords from me |
 | `update_attendance_record` | Update the navigation property attendanceRecords in me |
-| `delete_attendance_record` | Delete navigation property attendanceRecords for me |
+| `deletemy_attendance_record` | Delete navigation property attendanceRecords for me |
 | `get_attendance_count` | Get the number of the resource |
 | `get_online_meeting_attend_count` | Get the number of the resource |
 | `get_attendee_report` | Get onlineMeeting |
@@ -476,7 +476,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `count_online_meeting_recordings` | Get the number of the resource |
 | `get_my_meeting_recordings_delta` | Invoke function delta |
 | `get_online_meeting_transcripts` | Get callTranscript |
-| `create_transcript` | Create new navigation property to transcripts for me |
+| `create_transcript_me` | Create new navigation property to transcripts for me |
 | `get_call_transcript_by_id` | Get transcripts from me |
 | `update_transcript` | Update the navigation property transcripts in me |
 | `delete_transcript_by_id` | Delete navigation property transcripts for me |
@@ -592,7 +592,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `add_attendance_record` | Create new navigation property to attendanceRecords for communications |
 | `get_attendance_record_details` | Get attendanceRecords from communications |
 | `update_attendance_record_by_id` | Update the navigation property attendanceRecords in communications |
-| `delete_attendance_record` | Delete navigation property attendanceRecords for communications |
+| `deletecomm_attendance_record` | Delete navigation property attendanceRecords for communications |
 | `get_attendance_records_count` | Get the number of the resource |
 | `get_meeting_attendance_count` | Get the number of the resource |
 | `get_attendee_report_by_meeting_id` | Get attendeeReport for the navigation property onlineMeetings from communications |
@@ -612,7 +612,7 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `count_recordings` | Get the number of the resource |
 | `get_comm_meeting_recordings_delta` | Invoke function delta |
 | `get_online_meeting_transcript` | Get transcripts from communications |
-| `create_transcript` | Create new navigation property to transcripts for communications |
+| `create_transcript_comm` | Create new navigation property to transcripts for communications |
 | `get_transcript_data` | Get transcripts from communications |
 | `patch_transcript` | Update the navigation property transcripts in communications |
 | `delete_transcript` | Delete navigation property transcripts for communications |
@@ -654,10 +654,10 @@ This is automatically generated from OpenAPI schema for the MsteamsApp API.
 | `list_learning_course_activities` | Get learningCourseActivity |
 | `create_learning_course_activity` | Create learningCourseActivity |
 | `get_prov_learn_course_activity` | Get learningCourseActivities from employeeExperience |
-| `update_learning_course_activity` | Update learningCourseActivity |
+| `update_prov_course_activity_by_id` | Update learningCourseActivity |
 | `delete_learning_course_activity` | Delete learningCourseActivity |
 | `get_provider_course_activity` | Get learningCourseActivities from employeeExperience |
-| `update_learning_course_activity` | Update learningCourseActivity |
+| `update_prov_course_actvty_by_ext_id` | Update learningCourseActivity |
 | `delete_learning_activity_by_ext` | Delete learningCourseActivity |
 | `count_learning_course_activities` | Get the number of the resource |
 | `count_learning_providers` | Get the number of the resource |

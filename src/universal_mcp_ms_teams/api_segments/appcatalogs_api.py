@@ -39,7 +39,7 @@ class AppcatalogsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            appCatalogs.teamsApp
+            appCatalogs.teamsApp, important
         """
         url = f"{self.main_app_client.base_url}/appCatalogs/teamsApps"
         query_params = {

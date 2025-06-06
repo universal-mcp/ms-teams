@@ -39,7 +39,7 @@ class TeamstemplatesApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teamsTemplates.teamsTemplate
+            teamsTemplates.teamsTemplate, important
         """
         url = f"{self.main_app_client.base_url}/teamsTemplates"
         query_params = {
