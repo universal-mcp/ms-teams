@@ -2,65 +2,47 @@ from typing import Any, List, Optional
 from .api_segment_base import APISegmentBase
 
 
-class TeamsApi(APISegmentBase):
+class GroupsApi(APISegmentBase):
 
     def __init__(self, main_app_client: Any):
         super().__init__(main_app_client)
 
-    def list_teams(
+    def get_group_team(
         self,
-        top: Optional[int] = None,
-        skip: Optional[int] = None,
-        search: Optional[str] = None,
-        filter: Optional[str] = None,
-        count: Optional[bool] = None,
-        orderby: Optional[List[str]] = None,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
-    ) -> dict[str, Any]:
+    ) -> Any:
         """
 
-        List teams
+        Get team from groups
 
         Args:
-            top (integer): Show only the first n items Example: '50'.
-            skip (integer): Skip the first n items
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-            count (boolean): Include count of items
-            orderby (array): Order items by property values
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
         Returns:
-            dict[str, Any]: Retrieved collection
+            Any: Retrieved navigation property
 
         Raises:
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team, important
+            groups.team, important
         """
-        url = f"{self.main_app_client.base_url}/teams"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team"
         query_params = {
-            k: v
-            for k, v in [
-                ("$top", top),
-                ("$skip", skip),
-                ("$search", search),
-                ("$filter", filter),
-                ("$count", count),
-                ("$orderby", orderby),
-                ("$select", select),
-                ("$expand", expand),
-            ]
-            if v is not None
+            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team(
+    def create_team_from_group(
         self,
+        group_id: str,
         id: Optional[str] = None,
         classification: Optional[str] = None,
         createdDateTime: Optional[str] = None,
@@ -94,9 +76,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create team
+        Create team from group
 
         Args:
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             classification (string): An optional label. Typically describes the data or business sensitivity of the team. Must match one of a preconfigured set in the tenant's directory.
             createdDateTime (string): Timestamp at which the team was created.
@@ -129,14 +112,16 @@ class TeamsApi(APISegmentBase):
             template (string): template
 
         Returns:
-            Any: Created entity
+            Any: Success
 
         Raises:
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team
+            groups.team
         """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -173,9 +158,9 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team"
         query_params = {}
-        response = self._post(
+        response = self._put(
             url,
             data=request_body_data,
             params=query_params,
@@ -183,109 +168,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_info(
-        self,
-        team_id: str,
-        select: Optional[List[str]] = None,
-        expand: Optional[List[str]] = None,
-    ) -> Any:
+    def delete_group_team(self, group_id: str) -> Any:
         """
 
-        Get team
+        Delete navigation property team for groups
 
         Args:
-            team_id (string): team-id
-            select (array): Select properties to be returned
-            expand (array): Expand related entities
-
-        Returns:
-            Any: Retrieved entity
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.team
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}"
-        query_params = {
-            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def update_team(
-        self,
-        team_id: str,
-        id: Optional[str] = None,
-        classification: Optional[str] = None,
-        createdDateTime: Optional[str] = None,
-        description: Optional[str] = None,
-        displayName: Optional[str] = None,
-        firstChannelName: Optional[str] = None,
-        funSettings: Optional[dict[str, dict[str, Any]]] = None,
-        guestSettings: Optional[dict[str, dict[str, Any]]] = None,
-        internalId: Optional[str] = None,
-        isArchived: Optional[bool] = None,
-        memberSettings: Optional[dict[str, dict[str, Any]]] = None,
-        messagingSettings: Optional[dict[str, dict[str, Any]]] = None,
-        specialization: Optional[str] = None,
-        summary: Optional[dict[str, dict[str, Any]]] = None,
-        tenantId: Optional[str] = None,
-        visibility: Optional[str] = None,
-        webUrl: Optional[str] = None,
-        allChannels: Optional[List[Any]] = None,
-        channels: Optional[List[Any]] = None,
-        group: Optional[Any] = None,
-        incomingChannels: Optional[List[Any]] = None,
-        installedApps: Optional[List[Any]] = None,
-        members: Optional[List[Any]] = None,
-        operations: Optional[List[Any]] = None,
-        permissionGrants: Optional[List[Any]] = None,
-        photo: Optional[Any] = None,
-        primaryChannel: Optional[Any] = None,
-        schedule: Optional[Any] = None,
-        tags: Optional[List[Any]] = None,
-        template: Optional[Any] = None,
-    ) -> Any:
-        """
-
-        Update team
-
-        Args:
-            team_id (string): team-id
-            id (string): The unique identifier for an entity. Read-only.
-            classification (string): An optional label. Typically describes the data or business sensitivity of the team. Must match one of a preconfigured set in the tenant's directory.
-            createdDateTime (string): Timestamp at which the team was created.
-            description (string): An optional description for the team. Maximum length: 1,024 characters.
-            displayName (string): The name of the team.
-            firstChannelName (string): The name of the first channel in the team. This is an optional property, only used during team creation and isn't returned in methods to get and list teams.
-            funSettings (object): funSettings
-            guestSettings (object): guestSettings
-            internalId (string): A unique ID for the team that was used in a few places such as the audit log/Office 365 Management Activity API.
-            isArchived (boolean): Whether this team is in read-only mode.
-            memberSettings (object): memberSettings
-            messagingSettings (object): messagingSettings
-            specialization (string): specialization
-            summary (object): summary
-            tenantId (string): The ID of the Microsoft Entra tenant.
-            visibility (string): visibility
-            webUrl (string): A hyperlink that goes to the team in the Microsoft Teams client. You get this URL when you right-click a team in the Microsoft Teams client and select Get link to team. This URL should be treated as an opaque blob, and not parsed.
-            allChannels (array): List of channels either hosted in or shared with the team (incoming channels).
-            channels (array): The collection of channels and messages associated with the team.
-            group (string): group
-            incomingChannels (array): List of channels shared with the team.
-            installedApps (array): The apps installed in this team.
-            members (array): Members and owners of the team.
-            operations (array): The async operations that ran or are running on this team.
-            permissionGrants (array): A collection of permissions granted to apps to access the team.
-            photo (string): photo
-            primaryChannel (string): primaryChannel
-            schedule (string): schedule
-            tags (array): The tags associated with the team.
-            template (string): template
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -294,78 +183,18 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        request_body_data = None
-        request_body_data = {
-            "id": id,
-            "classification": classification,
-            "createdDateTime": createdDateTime,
-            "description": description,
-            "displayName": displayName,
-            "firstChannelName": firstChannelName,
-            "funSettings": funSettings,
-            "guestSettings": guestSettings,
-            "internalId": internalId,
-            "isArchived": isArchived,
-            "memberSettings": memberSettings,
-            "messagingSettings": messagingSettings,
-            "specialization": specialization,
-            "summary": summary,
-            "tenantId": tenantId,
-            "visibility": visibility,
-            "webUrl": webUrl,
-            "allChannels": allChannels,
-            "channels": channels,
-            "group": group,
-            "incomingChannels": incomingChannels,
-            "installedApps": installedApps,
-            "members": members,
-            "operations": operations,
-            "permissionGrants": permissionGrants,
-            "photo": photo,
-            "primaryChannel": primaryChannel,
-            "schedule": schedule,
-            "tags": tags,
-            "template": template,
-        }
-        request_body_data = {
-            k: v for k, v in request_body_data.items() if v is not None
-        }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}"
-        query_params = {}
-        response = self._patch(url, data=request_body_data, params=query_params)
-        return self._handle_response(response)
-
-    def delete_team_entity(self, team_id: str) -> Any:
-        """
-
-        Delete entity from teams
-
-        Args:
-            team_id (string): team-id
-
-        Returns:
-            Any: Success
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.team
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_all_team_channels(
+    def fetch_groups_team_all_channels(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -377,10 +206,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List allChannels
+        Get allChannels from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -397,11 +226,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/allChannels"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/allChannels"
         query_params = {
             k: v
             for k, v in [
@@ -419,19 +248,19 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_channels(
+    def get_group_team_all_channels(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get allChannels from teams
+        Get allChannels from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -443,54 +272,54 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/allChannels/{channel_id}"
+        query_params = {
+            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
+        }
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
+
+    def get_group_team_channels_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    ) -> Any:
+        """
+
+        Get the number of the resource
+
+        Args:
+            group_id (string): group-id
+            search (string): Search items by search phrases
+            filter (string): Filter items by property values
+
+        Returns:
+            Any: The count of the resource
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/allChannels/{channel_id}"
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/allChannels/$count"
         )
-        query_params = {
-            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def get_team_all_channels_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
-    ) -> Any:
-        """
-
-        Get the number of the resource
-
-        Args:
-            team_id (string): team-id
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-
-        Returns:
-            Any: The count of the resource
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.channel
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/allChannels/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_channels_for_team(
+    def get_group_team_channels(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -502,10 +331,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List channels
+        Get channels from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -522,11 +351,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels"
         query_params = {
             k: v
             for k, v in [
@@ -544,9 +373,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_channel(
+    def create_group_channel(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         description: Optional[str] = None,
@@ -567,10 +396,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create channel
+        Create new navigation property to channels for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdDateTime (string): Read only. Timestamp at which the channel was created.
             description (string): Optional textual description for the channel.
@@ -596,10 +425,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -623,7 +452,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels"
         query_params = {}
         response = self._post(
             url,
@@ -633,19 +462,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_channel_info(
+    def get_group_channels(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get channel
+        Get channels from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -657,22 +486,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_channel(
+    def update_group_channels(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         id: Optional[str] = None,
         createdDateTime: Optional[str] = None,
@@ -694,10 +523,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Patch channel
+        Update the navigation property channels in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             id (string): The unique identifier for an entity. Read-only.
             createdDateTime (string): Read only. Timestamp at which the channel was created.
@@ -724,10 +553,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -753,18 +582,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_channel(self, team_id: str, channel_id: str) -> Any:
+    def delete_group_channel(self, group_id: str, channel_id: str) -> Any:
         """
 
-        Delete channel
+        Delete navigation property channels for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
 
         Returns:
@@ -774,20 +603,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_all_team_channel_members(
+    def list_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -800,10 +629,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List allMembers
+        Get allMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -821,13 +650,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers"
         query_params = {
             k: v
             for k, v in [
@@ -845,9 +674,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_channel_members(
+    def create_group_team_channel_all_membe(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -856,10 +685,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to allMembers for teams
+        Create new navigation property to allMembers for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
@@ -873,10 +702,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -889,7 +718,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers"
         query_params = {}
         response = self._post(
             url,
@@ -899,9 +728,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_channel_members_details(
+    def get_channel_member_details(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         conversationMember_id: str,
         select: Optional[List[str]] = None,
@@ -909,10 +738,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get allMembers from teams
+        Get allMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             conversationMember_id (string): conversationMember-id
             select (array): Select properties to be returned
@@ -925,24 +754,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_conversation_member_in_team(
+    def update_group_team_channel_member(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         conversationMember_id: str,
         id: Optional[str] = None,
@@ -952,10 +781,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property allMembers in teams
+        Update the navigation property allMembers in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             conversationMember_id (string): conversationMember-id
             id (string): The unique identifier for an entity. Read-only.
@@ -970,10 +799,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if conversationMember_id is None:
@@ -988,20 +817,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_channel_member(
-        self, team_id: str, channel_id: str, conversationMember_id: str
+    def delete_group_channel_member(
+        self, group_id: str, channel_id: str, conversationMember_id: str
     ) -> Any:
         """
 
-        Delete navigation property allMembers for teams
+        Delete navigation property allMembers for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             conversationMember_id (string): conversationMember-id
 
@@ -1012,22 +841,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_team_channel_members(
+    def count_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -1037,7 +866,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -1049,28 +878,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_channel_members(
-        self, team_id: str, channel_id: str, values: Optional[List[Any]] = None
+    def add_group_channel_all_members(
+        self, group_id: str, channel_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action add
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             values (array): values
 
@@ -1081,10 +910,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -1092,7 +921,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/microsoft.graph.add"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/microsoft.graph.add"
         query_params = {}
         response = self._post(
             url,
@@ -1102,15 +931,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_team_channel_all_members(
-        self, team_id: str, channel_id: str, values: Optional[List[Any]] = None
+    def remove_channel_members(
+        self, group_id: str, channel_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action remove
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             values (array): values
 
@@ -1121,10 +950,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -1132,7 +961,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/microsoft.graph.remove"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/microsoft.graph.remove"
         query_params = {}
         response = self._post(
             url,
@@ -1142,19 +971,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_channel_files_folder(
+    def get_files_folder(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get filesFolder
+        Get filesFolder from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -1166,28 +995,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/filesFolder"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/filesFolder"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_files_folder_content(
-        self, team_id: str, channel_id: str, format: Optional[str] = None
+    def get_files_content(
+        self, group_id: str, channel_id: str, format: Optional[str] = None
     ) -> Any:
         """
 
-        Get content for the navigation property filesFolder from teams
+        Get content for the navigation property filesFolder from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             format (string): Format of the content
 
@@ -1198,26 +1027,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/filesFolder/content"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/filesFolder/content"
         query_params = {k: v for k, v in [("$format", format)] if v is not None}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_channel_file_content(
-        self, team_id: str, channel_id: str, body_content: bytes
+    def update_files_folder_content(
+        self, group_id: str, channel_id: str, body_content: bytes
     ) -> Any:
         """
 
-        Update content for the navigation property filesFolder in teams
+        Update content for the navigation property filesFolder in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             body_content (bytes | None): Raw binary content for the request body.
 
@@ -1228,15 +1057,15 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/filesFolder/content"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/filesFolder/content"
         query_params = {}
         response = self._put(
             url,
@@ -1246,13 +1075,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_team_channel_file_content(self, team_id: str, channel_id: str) -> Any:
+    def delete_file_content(self, group_id: str, channel_id: str) -> Any:
         """
 
-        Delete content for the navigation property filesFolder in teams
+        Delete content for the navigation property filesFolder in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
 
         Returns:
@@ -1262,20 +1091,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/filesFolder/content"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/filesFolder/content"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_channel_members_by_team_and_cha(
+    def get_group_team_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -1288,10 +1117,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List members of a channel
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -1309,13 +1138,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members"
         query_params = {
             k: v
             for k, v in [
@@ -1333,9 +1162,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_member_to_channel_teamwise(
+    def create_group_team_channel_member(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -1344,10 +1173,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Add member to channel
+        Create new navigation property to members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
@@ -1361,10 +1190,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -1377,7 +1206,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members"
         query_params = {}
         response = self._post(
             url,
@@ -1387,9 +1216,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_channel_member(
+    def get_group_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         conversationMember_id: str,
         select: Optional[List[str]] = None,
@@ -1397,10 +1226,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get member of channel
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             conversationMember_id (string): conversationMember-id
             select (array): Select properties to be returned
@@ -1413,24 +1242,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_channel_member_by_id(
+    def update_channel_member(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         conversationMember_id: str,
         id: Optional[str] = None,
@@ -1440,10 +1269,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update member in channel
+        Update the navigation property members in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             conversationMember_id (string): conversationMember-id
             id (string): The unique identifier for an entity. Read-only.
@@ -1458,10 +1287,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if conversationMember_id is None:
@@ -1476,20 +1305,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members/{conversationMember_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_conversation_member(
-        self, team_id: str, channel_id: str, conversationMember_id: str
+    def delete_member_from_channel(
+        self, group_id: str, channel_id: str, conversationMember_id: str
     ) -> Any:
         """
 
-        Delete conversationMember
+        Delete navigation property members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             conversationMember_id (string): conversationMember-id
 
@@ -1500,22 +1329,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members/{conversationMember_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_member_count(
+    def get_channel_member_count(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -1525,7 +1354,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -1537,28 +1366,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_channel_member_action(
-        self, team_id: str, channel_id: str, values: Optional[List[Any]] = None
+    def add_team_channel_member(
+        self, group_id: str, channel_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action add
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             values (array): values
 
@@ -1569,10 +1398,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -1580,7 +1409,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members/microsoft.graph.add"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members/microsoft.graph.add"
         query_params = {}
         response = self._post(
             url,
@@ -1590,15 +1419,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_member_action(
-        self, team_id: str, channel_id: str, values: Optional[List[Any]] = None
+    def remove_channel_member(
+        self, group_id: str, channel_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action remove
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             values (array): values
 
@@ -1609,10 +1438,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -1620,7 +1449,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/members/microsoft.graph.remove"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/members/microsoft.graph.remove"
         query_params = {}
         response = self._post(
             url,
@@ -1630,9 +1459,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def list_channel_messages_by_id(
+    def get_group_messages(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -1645,10 +1474,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List channel messages
+        Get messages from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -1666,13 +1495,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages"
         query_params = {
             k: v
             for k, v in [
@@ -1690,9 +1519,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def send_chat_message(
+    def create_group_channel_message(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         id: Optional[str] = None,
         attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
@@ -1722,10 +1551,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Send chatMessage in a channel or a chat
+        Create new navigation property to messages for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
@@ -1760,10 +1589,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -1797,7 +1626,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages"
         query_params = {}
         response = self._post(
             url,
@@ -1807,9 +1636,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_chat_message(
+    def get_group_channel_messages(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         select: Optional[List[str]] = None,
@@ -1817,10 +1646,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get chatMessage in a channel or chat
+        Get messages from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             select (array): Select properties to be returned
@@ -1833,24 +1662,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_chat_message_by_team_channel(
+    def update_message(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         id: Optional[str] = None,
@@ -1881,10 +1710,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update chatMessage
+        Update the navigation property messages in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             id (string): The unique identifier for an entity. Read-only.
@@ -1920,10 +1749,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -1959,20 +1788,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_channel_message(
-        self, team_id: str, channel_id: str, chatMessage_id: str
+    def delete_message_in_channel(
+        self, group_id: str, channel_id: str, chatMessage_id: str
     ) -> Any:
         """
 
-        Delete navigation property messages for teams
+        Delete navigation property messages for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
 
@@ -1983,22 +1812,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_channel_msg_hosted_content(
+    def list_group_team_channel_message_hos(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         top: Optional[int] = None,
@@ -2012,10 +1841,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List hostedContents
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             top (integer): Show only the first n items Example: '50'.
@@ -2034,15 +1863,15 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents"
         query_params = {
             k: v
             for k, v in [
@@ -2060,9 +1889,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_message_hosted_content(
+    def add_hosted_content(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         id: Optional[str] = None,
@@ -2071,10 +1900,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to hostedContents for teams
+        Create new navigation property to hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             id (string): The unique identifier for an entity. Read-only.
@@ -2088,10 +1917,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2105,7 +1934,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents"
         query_params = {}
         response = self._post(
             url,
@@ -2115,9 +1944,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_chat_message_hosted_content_by_i(
+    def get_team_channel_message_hosted_con(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
@@ -2126,10 +1955,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get hostedContents from teams
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -2143,10 +1972,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2155,16 +1984,16 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_hosted_content_details(
+    def patch_hosted_content(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
@@ -2174,10 +2003,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property hostedContents in teams
+        Update the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -2192,10 +2021,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2213,24 +2042,24 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def del_ch_msg_hosted_content(
+    def delete_group_team_channel_message_h(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
     ) -> Any:
         """
 
-        Delete navigation property hostedContents for teams
+        Delete navigation property hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -2242,10 +2071,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2254,24 +2083,24 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_channel_msg_hosted_content_val(
+    def get_group_channel_message_hosted_co(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
     ) -> Any:
         """
 
-        List hostedContents
+        Get media content for the navigation property hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -2283,10 +2112,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2295,14 +2124,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_hosted_content_val(
+    def update_group_team_channel_msg_hoste(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
@@ -2310,10 +2139,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update media content for the navigation property hostedContents in teams
+        Update media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -2326,10 +2155,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2340,7 +2169,7 @@ class TeamsApi(APISegmentBase):
             )
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._put(
             url,
@@ -2350,19 +2179,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_channel_message_hosted_cont(
+    def delete_hosted_content(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
     ) -> Any:
         """
 
-        Delete media content for the navigation property hostedContents in teams
+        Delete media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -2374,10 +2203,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2386,14 +2215,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_message_hosted_contents_by_me(
+    def get_hosted_content_count(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         search: Optional[str] = None,
@@ -2404,7 +2233,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             search (string): Search items by search phrases
@@ -2417,24 +2246,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/hostedContents/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def set_reaction_on_channel_message(
+    def set_reaction_on_group_team_channel_m(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         reactionType: Optional[str] = None,
@@ -2444,7 +2273,7 @@ class TeamsApi(APISegmentBase):
         Invoke action setReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             reactionType (string): reactionType
@@ -2456,10 +2285,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2469,7 +2298,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.setReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.setReaction"
         query_params = {}
         response = self._post(
             url,
@@ -2479,15 +2308,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def soft_delete_chat_message(
-        self, team_id: str, channel_id: str, chatMessage_id: str
+    def soft_delete_channel_message(
+        self, group_id: str, channel_id: str, chatMessage_id: str
     ) -> Any:
         """
 
         Invoke action softDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
 
@@ -2498,16 +2327,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.softDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.softDelete"
         query_params = {}
         response = self._post(
             url,
@@ -2517,15 +2346,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def restore_team_channel_message(
-        self, team_id: str, channel_id: str, chatMessage_id: str
+    def restore_group_channel_message(
+        self, group_id: str, channel_id: str, chatMessage_id: str
     ) -> Any:
         """
 
         Invoke action undoSoftDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
 
@@ -2536,16 +2365,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.undoSoftDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.undoSoftDelete"
         query_params = {}
         response = self._post(
             url,
@@ -2555,9 +2384,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unset_reaction_from_message(
+    def unset_reaction_on_message(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         reactionType: Optional[str] = None,
@@ -2567,7 +2396,7 @@ class TeamsApi(APISegmentBase):
         Invoke action unsetReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             reactionType (string): reactionType
@@ -2579,10 +2408,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2592,7 +2421,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.unsetReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/microsoft.graph.unsetReaction"
         query_params = {}
         response = self._post(
             url,
@@ -2602,9 +2431,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_replies(
+    def get_chat_message_replies(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         top: Optional[int] = None,
@@ -2618,10 +2447,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List replies
+        Get replies from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             top (integer): Show only the first n items Example: '50'.
@@ -2640,15 +2469,15 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies"
         query_params = {
             k: v
             for k, v in [
@@ -2666,9 +2495,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_channel_message_reply(
+    def create_reply_in_message(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         id: Optional[str] = None,
@@ -2699,10 +2528,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Reply to a message in a channel
+        Create new navigation property to replies for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             id (string): The unique identifier for an entity. Read-only.
@@ -2738,10 +2567,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2777,7 +2606,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies"
         query_params = {}
         response = self._post(
             url,
@@ -2787,9 +2616,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_chat_message_reply(
+    def get_reply_messages(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -2798,10 +2627,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get chatMessage in a channel or chat
+        Get replies from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -2815,26 +2644,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_message_reply(
+    def update_reply_message(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -2866,10 +2695,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property replies in teams
+        Update the navigation property replies in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -2906,10 +2735,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -2947,20 +2776,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_channel_message_reply_b(
-        self, team_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str
+    def delete_channel_message_reply_by_id(
+        self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
 
-        Delete navigation property replies for teams
+        Delete navigation property replies for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -2972,24 +2801,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_reply_hosted_contents_by_messa(
+    def get_group_team_channel_msg_replies_h(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3004,10 +2833,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List hostedContents
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3027,17 +2856,17 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
         query_params = {
             k: v
             for k, v in [
@@ -3055,9 +2884,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_hosted_content_link(
+    def add_reply_content(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3067,10 +2896,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to hostedContents for teams
+        Create new navigation property to hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3085,10 +2914,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3104,7 +2933,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
         query_params = {}
         response = self._post(
             url,
@@ -3114,9 +2943,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_channel_reply_hosted_content(
+    def get_hosted_content_by_reply_id(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3126,10 +2955,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get hostedContents from teams
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3144,10 +2973,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3158,16 +2987,16 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def patch_ch_reply_hosted_content(
+    def update_hosted_content_reply(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3178,10 +3007,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property hostedContents in teams
+        Update the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3197,10 +3026,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3220,14 +3049,14 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def del_ch_msg_reply_hosted_content(
+    def delete_hosted_content_by_message_id(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3235,10 +3064,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Delete navigation property hostedContents for teams
+        Delete navigation property hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3251,10 +3080,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3265,14 +3094,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_ch_msg_reply_hosted_content_val(
+    def get_group_team_channel_msg_hosted_co(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3280,10 +3109,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        List hostedContents
+        Get media content for the navigation property hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3296,10 +3125,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3310,14 +3139,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_msg_reply_hosted_content(
+    def update_group_team_channel_reply_hos(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3326,10 +3155,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update media content for the navigation property hostedContents in teams
+        Update media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3343,10 +3172,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3359,7 +3188,7 @@ class TeamsApi(APISegmentBase):
             )
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._put(
             url,
@@ -3369,9 +3198,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_hosted_content_by_message_re(
+    def delete_group_team_channel_message_r(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3379,10 +3208,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Delete media content for the navigation property hostedContents in teams
+        Delete media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3395,10 +3224,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3409,14 +3238,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_ch_msg_reply_host_contents(
+    def count_hosted_contents_replies(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3428,7 +3257,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3442,26 +3271,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_reaction_to_reply(
+    def set_reaction_to_message_reply(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3472,7 +3301,7 @@ class TeamsApi(APISegmentBase):
         Invoke action setReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3485,10 +3314,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3500,7 +3329,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.setReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.setReaction"
         query_params = {}
         response = self._post(
             url,
@@ -3510,15 +3339,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def soft_delete_channel_message_reply_p(
-        self, team_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str
+    def soft_delete_channel_message_reply(
+        self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
 
         Invoke action softDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3530,10 +3359,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3541,7 +3370,7 @@ class TeamsApi(APISegmentBase):
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.softDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.softDelete"
         query_params = {}
         response = self._post(
             url,
@@ -3551,15 +3380,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def undo_soft_delete_team_message_reply(
-        self, team_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str
+    def undo_message_reply_soft_delete(
+        self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
 
         Invoke action undoSoftDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3571,10 +3400,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3582,7 +3411,7 @@ class TeamsApi(APISegmentBase):
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.undoSoftDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.undoSoftDelete"
         query_params = {}
         response = self._post(
             url,
@@ -3592,9 +3421,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unset_message_reaction_reply(
+    def unset_reaction_on_reply(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
@@ -3605,7 +3434,7 @@ class TeamsApi(APISegmentBase):
         Invoke action unsetReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
@@ -3618,10 +3447,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
@@ -3633,7 +3462,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.unsetReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.unsetReaction"
         query_params = {}
         response = self._post(
             url,
@@ -3643,9 +3472,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def count_replies(
+    def get_reply_count(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         search: Optional[str] = None,
@@ -3656,7 +3485,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             search (string): Search items by search phrases
@@ -3669,24 +3498,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_delta_replies_for_message(
+    def get_microsoft_graph_delta_replies(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         chatMessage_id: str,
         top: Optional[int] = None,
@@ -3703,7 +3532,7 @@ class TeamsApi(APISegmentBase):
         Invoke function delta
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             chatMessage_id (string): chatMessage-id
             top (integer): Show only the first n items Example: '50'.
@@ -3722,15 +3551,15 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/microsoft.graph.delta()"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/microsoft.graph.delta()"
         query_params = {
             k: v
             for k, v in [
@@ -3748,9 +3577,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_channel_message_count(
+    def get_group_channel_message_count(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -3760,7 +3589,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -3772,22 +3601,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def delta_team_channel_messages(
+    def get_channel_messages_delta(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -3803,7 +3632,7 @@ class TeamsApi(APISegmentBase):
         Invoke function delta
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -3821,13 +3650,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/messages/microsoft.graph.delta()"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/microsoft.graph.delta()"
         query_params = {
             k: v
             for k, v in [
@@ -3845,9 +3674,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def archive_channel_action(
+    def archive_team_channel(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         shouldSetSpoSiteReadOnlyForMembers: Optional[bool] = None,
     ) -> Any:
@@ -3856,7 +3685,7 @@ class TeamsApi(APISegmentBase):
         Invoke action archive
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             shouldSetSpoSiteReadOnlyForMembers (boolean): shouldSetSpoSiteReadOnlyForMembers
 
@@ -3867,10 +3696,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -3880,7 +3709,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/microsoft.graph.archive"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/microsoft.graph.archive"
         query_params = {}
         response = self._post(
             url,
@@ -3890,13 +3719,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def complete_team_channel_migration(self, team_id: str, channel_id: str) -> Any:
+    def complete_group_channel_migration(self, group_id: str, channel_id: str) -> Any:
         """
 
         Invoke action completeMigration
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
 
         Returns:
@@ -3906,14 +3735,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/microsoft.graph.completeMigration"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/microsoft.graph.completeMigration"
         query_params = {}
         response = self._post(
             url,
@@ -3923,9 +3752,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def check_channel_user_access(
+    def check_user_access(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         userId: Optional[str] = None,
         tenantId: Optional[str] = None,
@@ -3936,7 +3765,7 @@ class TeamsApi(APISegmentBase):
         Invoke function doesUserHaveAccess
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             userId (string): Usage: userId='@userId'
             tenantId (string): Usage: tenantId='@tenantId'
@@ -3949,13 +3778,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/microsoft.graph.doesUserHaveAccess(userId='@userId',tenantId='@tenantId',userPrincipalName='@userPrincipalName')"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/microsoft.graph.doesUserHaveAccess(userId='@userId',tenantId='@tenantId',userPrincipalName='@userPrincipalName')"
         query_params = {
             k: v
             for k, v in [
@@ -3968,15 +3797,15 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def teams_channels_provision_email_pos(
-        self, team_id: str, channel_id: str
+    def provision_email_to_channel(
+        self, group_id: str, channel_id: str
     ) -> dict[str, Any]:
         """
 
         Invoke action provisionEmail
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
 
         Returns:
@@ -3986,14 +3815,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/microsoft.graph.provisionEmail"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/microsoft.graph.provisionEmail"
         query_params = {}
         response = self._post(
             url,
@@ -4003,13 +3832,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_channel_email_from_team(self, team_id: str, channel_id: str) -> Any:
+    def remove_channel_email(self, group_id: str, channel_id: str) -> Any:
         """
 
         Invoke action removeEmail
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
 
         Returns:
@@ -4019,14 +3848,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/microsoft.graph.removeEmail"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/microsoft.graph.removeEmail"
         query_params = {}
         response = self._post(
             url,
@@ -4036,13 +3865,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unarchive_team_channel(self, team_id: str, channel_id: str) -> Any:
+    def unarchive_channel(self, group_id: str, channel_id: str) -> Any:
         """
 
         Invoke action unarchive
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
 
         Returns:
@@ -4052,14 +3881,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/microsoft.graph.unarchive"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/microsoft.graph.unarchive"
         query_params = {}
         response = self._post(
             url,
@@ -4069,9 +3898,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def list_channel_shared_teams(
+    def get_channel_shared_teams(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -4084,10 +3913,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List sharedWithChannelTeamInfo
+        Get sharedWithTeams from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -4105,13 +3934,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams"
         query_params = {
             k: v
             for k, v in [
@@ -4129,9 +3958,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def share_channel_with_team(
+    def add_team_to_channel(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -4142,10 +3971,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to sharedWithTeams for teams
+        Create new navigation property to sharedWithTeams for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The name of the team.
@@ -4161,10 +3990,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -4179,7 +4008,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams"
         query_params = {}
         response = self._post(
             url,
@@ -4189,9 +4018,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_shared_teams_channels_info(
+    def get_shared_with_team_info(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         sharedWithChannelTeamInfo_id: str,
         select: Optional[List[str]] = None,
@@ -4199,10 +4028,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get sharedWithChannelTeamInfo
+        Get sharedWithTeams from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             select (array): Select properties to be returned
@@ -4215,26 +4044,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_shared_with_team_info(
+    def update_team_channel_sharing(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         sharedWithChannelTeamInfo_id: str,
         id: Optional[str] = None,
@@ -4246,10 +4075,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property sharedWithTeams in teams
+        Update the navigation property sharedWithTeams in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             id (string): The unique identifier for an entity. Read-only.
@@ -4266,10 +4095,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
@@ -4288,20 +4117,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_shared_team_channel_link(
-        self, team_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str
+    def delete_shared_team_channel(
+        self, group_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str
     ) -> Any:
         """
 
-        Delete sharedWithChannelTeamInfo
+        Delete navigation property sharedWithTeams for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
 
@@ -4312,24 +4141,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_channel_allowed_members_by_tea(
+    def get_shared_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         sharedWithChannelTeamInfo_id: str,
         top: Optional[int] = None,
@@ -4343,10 +4172,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List allowedMembers
+        Get allowedMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             top (integer): Show only the first n items Example: '50'.
@@ -4365,17 +4194,17 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers"
         query_params = {
             k: v
             for k, v in [
@@ -4393,9 +4222,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_channel_allowed_member_by_id(
+    def get_channel_allowed_member_by_ids(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         sharedWithChannelTeamInfo_id: str,
         conversationMember_id: str,
@@ -4404,10 +4233,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get allowedMembers from teams
+        Get allowedMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             conversationMember_id (string): conversationMember-id
@@ -4421,10 +4250,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
@@ -4433,16 +4262,16 @@ class TeamsApi(APISegmentBase):
             )
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_shared_team_members_count(
+    def count_allowed_members_by_channel_te(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         sharedWithChannelTeamInfo_id: str,
         search: Optional[str] = None,
@@ -4453,7 +4282,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             search (string): Search items by search phrases
@@ -4466,26 +4295,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_shared_team_channel_info(
+    def get_shared_team_info(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         sharedWithChannelTeamInfo_id: str,
         select: Optional[List[str]] = None,
@@ -4493,10 +4322,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get team from teams
+        Get team from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             select (array): Select properties to be returned
@@ -4509,26 +4338,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/team"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/team"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def count_shared_with_teams_in_channel(
+    def get_shared_with_teams_count_in_chann(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -4538,7 +4367,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -4550,22 +4379,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/sharedWithTeams/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_channel_tabs(
+    def get_group_team_tabs(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -4578,10 +4407,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List tabs in channel
+        Get tabs from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -4599,13 +4428,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs"
         query_params = {
             k: v
             for k, v in [
@@ -4623,9 +4452,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_channel_tab(
+    def create_group_tab(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         id: Optional[str] = None,
         configuration: Optional[dict[str, dict[str, Any]]] = None,
@@ -4635,10 +4464,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Add tab to channel
+        Create new navigation property to tabs for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             id (string): The unique identifier for an entity. Read-only.
             configuration (object): configuration
@@ -4653,10 +4482,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         request_body_data = None
@@ -4670,7 +4499,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs"
         query_params = {}
         response = self._post(
             url,
@@ -4680,9 +4509,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_tab_info(
+    def get_group_tabs(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         teamsTab_id: str,
         select: Optional[List[str]] = None,
@@ -4690,10 +4519,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get tab
+        Get tabs from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             teamsTab_id (string): teamsTab-id
             select (array): Select properties to be returned
@@ -4706,24 +4535,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs/{teamsTab_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs/{teamsTab_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_tab_info(
+    def update_group_tab(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         teamsTab_id: str,
         id: Optional[str] = None,
@@ -4734,10 +4563,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update tab
+        Update the navigation property tabs in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             teamsTab_id (string): teamsTab-id
             id (string): The unique identifier for an entity. Read-only.
@@ -4753,10 +4582,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if teamsTab_id is None:
@@ -4772,20 +4601,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs/{teamsTab_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs/{teamsTab_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_channel_tab_by_id(
-        self, team_id: str, channel_id: str, teamsTab_id: str
-    ) -> Any:
+    def delete_group_tab(self, group_id: str, channel_id: str, teamsTab_id: str) -> Any:
         """
 
-        Delete tab from channel
+        Delete navigation property tabs for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             teamsTab_id (string): teamsTab-id
 
@@ -4796,22 +4623,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs/{teamsTab_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs/{teamsTab_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_teams_app_data(
+    def get_teams_app_tab(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         teamsTab_id: str,
         select: Optional[List[str]] = None,
@@ -4819,10 +4646,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get teamsApp from teams
+        Get teamsApp from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             teamsTab_id (string): teamsTab-id
             select (array): Select properties to be returned
@@ -4835,24 +4662,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs/{teamsTab_id}/teamsApp"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs/{teamsTab_id}/teamsApp"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def count_team_channel_tabs(
+    def get_channel_tabs_count(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -4862,7 +4689,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -4874,28 +4701,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/{channel_id}/tabs/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/{channel_id}/tabs/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def count_team_channels(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_group_channel_total(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -4906,20 +4733,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_channel_messages(
+    def get_group_team_channel_messages_all(
         self,
-        team_id: str,
+        group_id: str,
         model: Optional[str] = None,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -4935,7 +4762,7 @@ class TeamsApi(APISegmentBase):
         Invoke function getAllMessages
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             model (string): The payment model for the API
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -4953,11 +4780,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/microsoft.graph.getAllMessages()"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/microsoft.graph.getAllMessages()"
         query_params = {
             k: v
             for k, v in [
@@ -4976,9 +4803,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_retained_messages_by_team_id(
+    def get_retained_messages(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -4993,7 +4820,7 @@ class TeamsApi(APISegmentBase):
         Invoke function getAllRetainedMessages
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -5010,11 +4837,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/channels/microsoft.graph.getAllRetainedMessages()"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/channels/microsoft.graph.getAllRetainedMessages()"
         query_params = {
             k: v
             for k, v in [
@@ -5032,18 +4859,18 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_group(
+    def get_group_team_data(
         self,
-        team_id: str,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get group from teams
+        Get group from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
@@ -5054,20 +4881,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.group
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/group"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/group"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_service_provisioning_errors(
+    def get_group_service_errors(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -5082,7 +4909,7 @@ class TeamsApi(APISegmentBase):
         Get serviceProvisioningErrors property value
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -5099,11 +4926,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.group
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/group/serviceProvisioningErrors"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/group/serviceProvisioningErrors"
         query_params = {
             k: v
             for k, v in [
@@ -5121,15 +4948,15 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_provisioning_errors_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_service_provisioning_errors(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -5140,20 +4967,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.group
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/group/serviceProvisioningErrors/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/group/serviceProvisioningErrors/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_incoming_team_channels(
+    def get_group_incoming_channels(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -5165,10 +4992,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List incomingChannels
+        Get incomingChannels from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -5185,11 +5012,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/incomingChannels"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/incomingChannels"
         query_params = {
             k: v
             for k, v in [
@@ -5207,19 +5034,19 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_incoming_channel_by_team_id(
+    def get_incoming_channels_by_group(
         self,
-        team_id: str,
+        group_id: str,
         channel_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get incomingChannels from teams
+        Get incomingChannels from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             channel_id (string): channel-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -5231,28 +5058,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if channel_id is None:
             raise ValueError("Missing required parameter 'channel-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/incomingChannels/{channel_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/incomingChannels/{channel_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_incoming_channels_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_incoming_channels_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -5263,20 +5090,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/incomingChannels/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/incomingChannels/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_apps(
+    def list_group_team_apps(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -5288,10 +5115,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List apps in team
+        Get installedApps from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -5308,11 +5135,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps"
         query_params = {
             k: v
             for k, v in [
@@ -5330,9 +5157,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_app(
+    def add_group_installed_app(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         consentedPermissionSet: Optional[dict[str, dict[str, Any]]] = None,
         teamsApp: Optional[Any] = None,
@@ -5340,10 +5167,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Add app to team
+        Create new navigation property to installedApps for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             consentedPermissionSet (object): consentedPermissionSet
             teamsApp (string): teamsApp
@@ -5356,10 +5183,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -5370,7 +5197,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps"
         query_params = {}
         response = self._post(
             url,
@@ -5380,19 +5207,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_installed_team_app(
+    def get_group_installed_apps(
         self,
-        team_id: str,
+        group_id: str,
         teamsAppInstallation_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get installed app in team
+        Get installedApps from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -5404,22 +5231,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsAppInstallation_id is None:
             raise ValueError("Missing required parameter 'teamsAppInstallation-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/{teamsAppInstallation_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/{teamsAppInstallation_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_teams_installed_app_navigat(
+    def patch_installed_apps(
         self,
-        team_id: str,
+        group_id: str,
         teamsAppInstallation_id: str,
         id: Optional[str] = None,
         consentedPermissionSet: Optional[dict[str, dict[str, Any]]] = None,
@@ -5428,10 +5255,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property installedApps in teams
+        Update the navigation property installedApps in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
             id (string): The unique identifier for an entity. Read-only.
             consentedPermissionSet (object): consentedPermissionSet
@@ -5445,10 +5272,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsAppInstallation_id is None:
             raise ValueError("Missing required parameter 'teamsAppInstallation-id'.")
         request_body_data = None
@@ -5461,20 +5288,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/{teamsAppInstallation_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/{teamsAppInstallation_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def remove_team_installed_app(
-        self, team_id: str, teamsAppInstallation_id: str
+    def delete_installed_app_for_group_team(
+        self, group_id: str, teamsAppInstallation_id: str
     ) -> Any:
         """
 
-        Remove app from team
+        Delete navigation property installedApps for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
 
         Returns:
@@ -5484,20 +5311,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsAppInstallation_id is None:
             raise ValueError("Missing required parameter 'teamsAppInstallation-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/{teamsAppInstallation_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/{teamsAppInstallation_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def upgrade_team_app(
+    def upgrade_teams_app(
         self,
-        team_id: str,
+        group_id: str,
         teamsAppInstallation_id: str,
         consentedPermissionSet: Optional[dict[str, dict[str, Any]]] = None,
     ) -> Any:
@@ -5506,7 +5333,7 @@ class TeamsApi(APISegmentBase):
         Invoke action upgrade
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
             consentedPermissionSet (object): consentedPermissionSet
 
@@ -5517,10 +5344,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsAppInstallation_id is None:
             raise ValueError("Missing required parameter 'teamsAppInstallation-id'.")
         request_body_data = None
@@ -5528,7 +5355,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/{teamsAppInstallation_id}/microsoft.graph.upgrade"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/{teamsAppInstallation_id}/microsoft.graph.upgrade"
         query_params = {}
         response = self._post(
             url,
@@ -5538,19 +5365,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_teams_app_detail(
+    def get_teams_app_details(
         self,
-        team_id: str,
+        group_id: str,
         teamsAppInstallation_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get teamsApp from teams
+        Get teamsApp from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -5562,32 +5389,32 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsAppInstallation_id is None:
             raise ValueError("Missing required parameter 'teamsAppInstallation-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/{teamsAppInstallation_id}/teamsApp"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/{teamsAppInstallation_id}/teamsApp"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_app_definition(
+    def get_teams_app_definition(
         self,
-        team_id: str,
+        group_id: str,
         teamsAppInstallation_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get teamsAppDefinition from teams
+        Get teamsAppDefinition from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -5599,28 +5426,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsAppInstallation_id is None:
             raise ValueError("Missing required parameter 'teamsAppInstallation-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/{teamsAppInstallation_id}/teamsAppDefinition"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/{teamsAppInstallation_id}/teamsAppDefinition"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_installed_app_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_group_team_apps(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -5631,20 +5458,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAppInstallation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/installedApps/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/installedApps/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_members_list(
+    def get_group_members(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -5656,10 +5483,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List members of team
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -5676,11 +5503,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members"
         query_params = {
             k: v
             for k, v in [
@@ -5698,9 +5525,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_member_to_team(
+    def create_group_member(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
         roles: Optional[List[str]] = None,
@@ -5708,10 +5535,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Add member to team
+        Create new navigation property to members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
             roles (array): The roles for that user. This property contains more qualifiers only when relevant - for example, if the member has owner privileges, the roles property contains owner as one of the values. Similarly, if the member is an in-tenant guest, the roles property contains guest as one of the values. A basic member shouldn't have any values specified in the roles property. An Out-of-tenant external member is assigned the owner role.
@@ -5724,10 +5551,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -5738,7 +5565,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members"
         query_params = {}
         response = self._post(
             url,
@@ -5748,19 +5575,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_member_details(
+    def get_group_team_members(
         self,
-        team_id: str,
+        group_id: str,
         conversationMember_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get member of team
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -5772,22 +5599,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_member_conversation_me(
+    def update_group_team_member(
         self,
-        team_id: str,
+        group_id: str,
         conversationMember_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -5796,10 +5623,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update member in team
+        Update the navigation property members in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
@@ -5813,10 +5640,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         request_body_data = None
@@ -5829,18 +5656,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members/{conversationMember_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def remove_team_member_by_id(self, team_id: str, conversationMember_id: str) -> Any:
+    def delete_group_member(self, group_id: str, conversationMember_id: str) -> Any:
         """
 
-        Remove member from team
+        Delete navigation property members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
 
         Returns:
@@ -5850,26 +5677,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members/{conversationMember_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_member_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_group_team_member_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -5880,26 +5707,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_members_by_graph_action(
-        self, team_id: str, values: Optional[List[Any]] = None
+    def add_group_team_member_action(
+        self, group_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action add
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             values (array): values
 
         Returns:
@@ -5909,16 +5736,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"values": values}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members/microsoft.graph.add"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members/microsoft.graph.add"
         query_params = {}
         response = self._post(
             url,
@@ -5928,15 +5755,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_team_member_by_graph_action(
-        self, team_id: str, values: Optional[List[Any]] = None
+    def remove_team_member_action(
+        self, group_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action remove
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             values (array): values
 
         Returns:
@@ -5946,16 +5773,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.conversationMember
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"values": values}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/members/microsoft.graph.remove"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/members/microsoft.graph.remove"
         query_params = {}
         response = self._post(
             url,
@@ -5965,15 +5792,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def team_archive_action(
-        self, team_id: str, shouldSetSpoSiteReadOnlyForMembers: Optional[bool] = None
+    def archive_group_team(
+        self, group_id: str, shouldSetSpoSiteReadOnlyForMembers: Optional[bool] = None
     ) -> Any:
         """
 
         Invoke action archive
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             shouldSetSpoSiteReadOnlyForMembers (boolean): shouldSetSpoSiteReadOnlyForMembers
 
         Returns:
@@ -5983,10 +5810,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team.Actions
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "shouldSetSpoSiteReadOnlyForMembers": shouldSetSpoSiteReadOnlyForMembers
@@ -5994,7 +5821,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/microsoft.graph.archive"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/microsoft.graph.archive"
         query_params = {}
         response = self._post(
             url,
@@ -6004,9 +5831,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def clone_team_action(
+    def clone_team_group(
         self,
-        team_id: str,
+        group_id: str,
         displayName: Optional[str] = None,
         description: Optional[str] = None,
         mailNickname: Optional[str] = None,
@@ -6019,7 +5846,7 @@ class TeamsApi(APISegmentBase):
         Invoke action clone
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             displayName (string): displayName
             description (string): description
             mailNickname (string): mailNickname
@@ -6034,10 +5861,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team.Actions
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "displayName": displayName,
@@ -6050,7 +5877,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/microsoft.graph.clone"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/microsoft.graph.clone"
         query_params = {}
         response = self._post(
             url,
@@ -6060,13 +5887,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def complete_team_migration_action(self, team_id: str) -> Any:
+    def complete_group_team_migration(self, group_id: str) -> Any:
         """
 
         Invoke action completeMigration
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -6075,12 +5902,12 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team.Actions
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/microsoft.graph.completeMigration"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/microsoft.graph.completeMigration"
         query_params = {}
         response = self._post(
             url,
@@ -6090,9 +5917,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def teams_send_activity_notif(
+    def send_activity_notification_to_grou(
         self,
-        team_id: str,
+        group_id: str,
         topic: Optional[dict[str, dict[str, Any]]] = None,
         activityType: Optional[str] = None,
         chainId: Optional[float] = None,
@@ -6106,7 +5933,7 @@ class TeamsApi(APISegmentBase):
         Invoke action sendActivityNotification
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             topic (object): topic
             activityType (string): activityType
             chainId (number): chainId
@@ -6122,10 +5949,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team.Actions
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "topic": topic,
@@ -6139,7 +5966,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/microsoft.graph.sendActivityNotification"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/microsoft.graph.sendActivityNotification"
         query_params = {}
         response = self._post(
             url,
@@ -6149,13 +5976,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unarchive_team_operation(self, team_id: str) -> Any:
+    def unarchive_group_team(self, group_id: str) -> Any:
         """
 
         Invoke action unarchive
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -6164,26 +5991,305 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.team.Actions
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/microsoft.graph.unarchive"
+        query_params = {}
+        response = self._post(
+            url,
+            data=request_body_data,
+            params=query_params,
+            content_type="application/json",
+        )
+        return self._handle_response(response)
+
+    def get_group_operations(
+        self,
+        group_id: str,
+        top: Optional[int] = None,
+        skip: Optional[int] = None,
+        search: Optional[str] = None,
+        filter: Optional[str] = None,
+        count: Optional[bool] = None,
+        orderby: Optional[List[str]] = None,
+        select: Optional[List[str]] = None,
+        expand: Optional[List[str]] = None,
+    ) -> dict[str, Any]:
+        """
+
+        Get operations from groups
+
+        Args:
+            group_id (string): group-id
+            top (integer): Show only the first n items Example: '50'.
+            skip (integer): Skip the first n items
+            search (string): Search items by search phrases
+            filter (string): Filter items by property values
+            count (boolean): Include count of items
+            orderby (array): Order items by property values
+            select (array): Select properties to be returned
+            expand (array): Expand related entities
+
+        Returns:
+            dict[str, Any]: Retrieved collection
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/operations"
+        query_params = {
+            k: v
+            for k, v in [
+                ("$top", top),
+                ("$skip", skip),
+                ("$search", search),
+                ("$filter", filter),
+                ("$count", count),
+                ("$orderby", orderby),
+                ("$select", select),
+                ("$expand", expand),
+            ]
+            if v is not None
+        }
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
+
+    def create_group_team_operation(
+        self,
+        group_id: str,
+        id: Optional[str] = None,
+        attemptsCount: Optional[float] = None,
+        createdDateTime: Optional[str] = None,
+        error: Optional[dict[str, dict[str, Any]]] = None,
+        lastActionDateTime: Optional[str] = None,
+        operationType: Optional[str] = None,
+        status: Optional[str] = None,
+        targetResourceId: Optional[str] = None,
+        targetResourceLocation: Optional[str] = None,
+    ) -> Any:
+        """
+
+        Create new navigation property to operations for groups
+
+        Args:
+            group_id (string): group-id
+            id (string): The unique identifier for an entity. Read-only.
+            attemptsCount (number): Number of times the operation was attempted before being marked successful or failed.
+            createdDateTime (string): Time when the operation was created.
+            error (object): error
+            lastActionDateTime (string): Time when the async operation was last updated.
+            operationType (string): operationType
+            status (string): status
+            targetResourceId (string): The ID of the object that's created or modified as result of this async operation, typically a team.
+            targetResourceLocation (string): The location of the object that's created or modified as result of this async operation. This URL should be treated as an opaque value and not parsed into its component paths.
+
+        Returns:
+            Any: Created navigation property.
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        request_body_data = None
+        request_body_data = {
+            "id": id,
+            "attemptsCount": attemptsCount,
+            "createdDateTime": createdDateTime,
+            "error": error,
+            "lastActionDateTime": lastActionDateTime,
+            "operationType": operationType,
+            "status": status,
+            "targetResourceId": targetResourceId,
+            "targetResourceLocation": targetResourceLocation,
+        }
+        request_body_data = {
+            k: v for k, v in request_body_data.items() if v is not None
+        }
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/operations"
+        query_params = {}
+        response = self._post(
+            url,
+            data=request_body_data,
+            params=query_params,
+            content_type="application/json",
+        )
+        return self._handle_response(response)
+
+    def get_group_team_operations(
+        self,
+        group_id: str,
+        teamsAsyncOperation_id: str,
+        select: Optional[List[str]] = None,
+        expand: Optional[List[str]] = None,
+    ) -> Any:
+        """
+
+        Get operations from groups
+
+        Args:
+            group_id (string): group-id
+            teamsAsyncOperation_id (string): teamsAsyncOperation-id
+            select (array): Select properties to be returned
+            expand (array): Expand related entities
+
+        Returns:
+            Any: Retrieved navigation property
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        if teamsAsyncOperation_id is None:
+            raise ValueError("Missing required parameter 'teamsAsyncOperation-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/operations/{teamsAsyncOperation_id}"
+        query_params = {
+            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
+        }
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
+
+    def update_group_operations(
+        self,
+        group_id: str,
+        teamsAsyncOperation_id: str,
+        id: Optional[str] = None,
+        attemptsCount: Optional[float] = None,
+        createdDateTime: Optional[str] = None,
+        error: Optional[dict[str, dict[str, Any]]] = None,
+        lastActionDateTime: Optional[str] = None,
+        operationType: Optional[str] = None,
+        status: Optional[str] = None,
+        targetResourceId: Optional[str] = None,
+        targetResourceLocation: Optional[str] = None,
+    ) -> Any:
+        """
+
+        Update the navigation property operations in groups
+
+        Args:
+            group_id (string): group-id
+            teamsAsyncOperation_id (string): teamsAsyncOperation-id
+            id (string): The unique identifier for an entity. Read-only.
+            attemptsCount (number): Number of times the operation was attempted before being marked successful or failed.
+            createdDateTime (string): Time when the operation was created.
+            error (object): error
+            lastActionDateTime (string): Time when the async operation was last updated.
+            operationType (string): operationType
+            status (string): status
+            targetResourceId (string): The ID of the object that's created or modified as result of this async operation, typically a team.
+            targetResourceLocation (string): The location of the object that's created or modified as result of this async operation. This URL should be treated as an opaque value and not parsed into its component paths.
+
+        Returns:
+            Any: Success
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        if teamsAsyncOperation_id is None:
+            raise ValueError("Missing required parameter 'teamsAsyncOperation-id'.")
+        request_body_data = None
+        request_body_data = {
+            "id": id,
+            "attemptsCount": attemptsCount,
+            "createdDateTime": createdDateTime,
+            "error": error,
+            "lastActionDateTime": lastActionDateTime,
+            "operationType": operationType,
+            "status": status,
+            "targetResourceId": targetResourceId,
+            "targetResourceLocation": targetResourceLocation,
+        }
+        request_body_data = {
+            k: v for k, v in request_body_data.items() if v is not None
+        }
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/operations/{teamsAsyncOperation_id}"
+        query_params = {}
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
+
+    def delete_group_operation(self, group_id: str, teamsAsyncOperation_id: str) -> Any:
+        """
+
+        Delete navigation property operations for groups
+
+        Args:
+            group_id (string): group-id
+            teamsAsyncOperation_id (string): teamsAsyncOperation-id
+
+        Returns:
+            Any: Success
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        if teamsAsyncOperation_id is None:
+            raise ValueError("Missing required parameter 'teamsAsyncOperation-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/operations/{teamsAsyncOperation_id}"
+        query_params = {}
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
+
+    def get_group_team_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    ) -> Any:
+        """
+
+        Get the number of the resource
+
+        Args:
+            group_id (string): group-id
+            search (string): Search items by search phrases
+            filter (string): Filter items by property values
+
+        Returns:
+            Any: The count of the resource
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/microsoft.graph.unarchive"
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/operations/$count"
         )
-        query_params = {}
-        response = self._post(
-            url,
-            data=request_body_data,
-            params=query_params,
-            content_type="application/json",
-        )
+        query_params = {
+            k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
+        }
+        response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_operations_by_id(
+    def list_group_team_permission_grants(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -6195,10 +6301,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get operations from teams
+        Get permissionGrants from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -6215,11 +6321,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsAsyncOperation
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/operations"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/permissionGrants"
         query_params = {
             k: v
             for k, v in [
@@ -6237,290 +6343,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_operation(
+    def create_permission_grant(
         self,
-        team_id: str,
-        id: Optional[str] = None,
-        attemptsCount: Optional[float] = None,
-        createdDateTime: Optional[str] = None,
-        error: Optional[dict[str, dict[str, Any]]] = None,
-        lastActionDateTime: Optional[str] = None,
-        operationType: Optional[str] = None,
-        status: Optional[str] = None,
-        targetResourceId: Optional[str] = None,
-        targetResourceLocation: Optional[str] = None,
-    ) -> Any:
-        """
-
-        Create new navigation property to operations for teams
-
-        Args:
-            team_id (string): team-id
-            id (string): The unique identifier for an entity. Read-only.
-            attemptsCount (number): Number of times the operation was attempted before being marked successful or failed.
-            createdDateTime (string): Time when the operation was created.
-            error (object): error
-            lastActionDateTime (string): Time when the async operation was last updated.
-            operationType (string): operationType
-            status (string): status
-            targetResourceId (string): The ID of the object that's created or modified as result of this async operation, typically a team.
-            targetResourceLocation (string): The location of the object that's created or modified as result of this async operation. This URL should be treated as an opaque value and not parsed into its component paths.
-
-        Returns:
-            Any: Created navigation property.
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.teamsAsyncOperation
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        request_body_data = None
-        request_body_data = {
-            "id": id,
-            "attemptsCount": attemptsCount,
-            "createdDateTime": createdDateTime,
-            "error": error,
-            "lastActionDateTime": lastActionDateTime,
-            "operationType": operationType,
-            "status": status,
-            "targetResourceId": targetResourceId,
-            "targetResourceLocation": targetResourceLocation,
-        }
-        request_body_data = {
-            k: v for k, v in request_body_data.items() if v is not None
-        }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/operations"
-        query_params = {}
-        response = self._post(
-            url,
-            data=request_body_data,
-            params=query_params,
-            content_type="application/json",
-        )
-        return self._handle_response(response)
-
-    def get_teams_async_operation_by_id(
-        self,
-        team_id: str,
-        teamsAsyncOperation_id: str,
-        select: Optional[List[str]] = None,
-        expand: Optional[List[str]] = None,
-    ) -> Any:
-        """
-
-        Get operations from teams
-
-        Args:
-            team_id (string): team-id
-            teamsAsyncOperation_id (string): teamsAsyncOperation-id
-            select (array): Select properties to be returned
-            expand (array): Expand related entities
-
-        Returns:
-            Any: Retrieved navigation property
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.teamsAsyncOperation
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        if teamsAsyncOperation_id is None:
-            raise ValueError("Missing required parameter 'teamsAsyncOperation-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/operations/{teamsAsyncOperation_id}"
-        query_params = {
-            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def update_team_operation(
-        self,
-        team_id: str,
-        teamsAsyncOperation_id: str,
-        id: Optional[str] = None,
-        attemptsCount: Optional[float] = None,
-        createdDateTime: Optional[str] = None,
-        error: Optional[dict[str, dict[str, Any]]] = None,
-        lastActionDateTime: Optional[str] = None,
-        operationType: Optional[str] = None,
-        status: Optional[str] = None,
-        targetResourceId: Optional[str] = None,
-        targetResourceLocation: Optional[str] = None,
-    ) -> Any:
-        """
-
-        Update the navigation property operations in teams
-
-        Args:
-            team_id (string): team-id
-            teamsAsyncOperation_id (string): teamsAsyncOperation-id
-            id (string): The unique identifier for an entity. Read-only.
-            attemptsCount (number): Number of times the operation was attempted before being marked successful or failed.
-            createdDateTime (string): Time when the operation was created.
-            error (object): error
-            lastActionDateTime (string): Time when the async operation was last updated.
-            operationType (string): operationType
-            status (string): status
-            targetResourceId (string): The ID of the object that's created or modified as result of this async operation, typically a team.
-            targetResourceLocation (string): The location of the object that's created or modified as result of this async operation. This URL should be treated as an opaque value and not parsed into its component paths.
-
-        Returns:
-            Any: Success
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.teamsAsyncOperation
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        if teamsAsyncOperation_id is None:
-            raise ValueError("Missing required parameter 'teamsAsyncOperation-id'.")
-        request_body_data = None
-        request_body_data = {
-            "id": id,
-            "attemptsCount": attemptsCount,
-            "createdDateTime": createdDateTime,
-            "error": error,
-            "lastActionDateTime": lastActionDateTime,
-            "operationType": operationType,
-            "status": status,
-            "targetResourceId": targetResourceId,
-            "targetResourceLocation": targetResourceLocation,
-        }
-        request_body_data = {
-            k: v for k, v in request_body_data.items() if v is not None
-        }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/operations/{teamsAsyncOperation_id}"
-        query_params = {}
-        response = self._patch(url, data=request_body_data, params=query_params)
-        return self._handle_response(response)
-
-    def delete_teams_async_operation_for_te(
-        self, team_id: str, teamsAsyncOperation_id: str
-    ) -> Any:
-        """
-
-        Delete navigation property operations for teams
-
-        Args:
-            team_id (string): team-id
-            teamsAsyncOperation_id (string): teamsAsyncOperation-id
-
-        Returns:
-            Any: Success
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.teamsAsyncOperation
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        if teamsAsyncOperation_id is None:
-            raise ValueError("Missing required parameter 'teamsAsyncOperation-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/operations/{teamsAsyncOperation_id}"
-        query_params = {}
-        response = self._delete(url, params=query_params)
-        return self._handle_response(response)
-
-    def get_team_operation_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
-    ) -> Any:
-        """
-
-        Get the number of the resource
-
-        Args:
-            team_id (string): team-id
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-
-        Returns:
-            Any: The count of the resource
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.teamsAsyncOperation
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/operations/$count"
-        query_params = {
-            k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def list_team_permission_grants(
-        self,
-        team_id: str,
-        top: Optional[int] = None,
-        skip: Optional[int] = None,
-        search: Optional[str] = None,
-        filter: Optional[str] = None,
-        count: Optional[bool] = None,
-        orderby: Optional[List[str]] = None,
-        select: Optional[List[str]] = None,
-        expand: Optional[List[str]] = None,
-    ) -> dict[str, Any]:
-        """
-
-        List permissionGrants of a team
-
-        Args:
-            team_id (string): team-id
-            top (integer): Show only the first n items Example: '50'.
-            skip (integer): Skip the first n items
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-            count (boolean): Include count of items
-            orderby (array): Order items by property values
-            select (array): Select properties to be returned
-            expand (array): Expand related entities
-
-        Returns:
-            dict[str, Any]: Retrieved collection
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.resourceSpecificPermissionGrant
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/permissionGrants"
-        query_params = {
-            k: v
-            for k, v in [
-                ("$top", top),
-                ("$skip", skip),
-                ("$search", search),
-                ("$filter", filter),
-                ("$count", count),
-                ("$orderby", orderby),
-                ("$select", select),
-                ("$expand", expand),
-            ]
-            if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def create_team_permission_grant(
-        self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         clientAppId: Optional[str] = None,
@@ -6531,10 +6356,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to permissionGrants for teams
+        Create new navigation property to permissionGrants for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             deletedDateTime (string): Date and time when this object was deleted. Always null when the object hasn't been deleted.
             clientAppId (string): ID of the service principal of the Microsoft Entra app that has been granted access. Read-only.
@@ -6550,10 +6375,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.resourceSpecificPermissionGrant
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -6567,7 +6392,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/permissionGrants"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/permissionGrants"
         query_params = {}
         response = self._post(
             url,
@@ -6577,19 +6402,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_permission_grant_by_team_resour(
+    def get_group_permission_grants(
         self,
-        team_id: str,
+        group_id: str,
         resourceSpecificPermissionGrant_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get permissionGrants from teams
+        Get permissionGrants from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             resourceSpecificPermissionGrant_id (string): resourceSpecificPermissionGrant-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -6601,24 +6426,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.resourceSpecificPermissionGrant
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if resourceSpecificPermissionGrant_id is None:
             raise ValueError(
                 "Missing required parameter 'resourceSpecificPermissionGrant-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/permissionGrants/{resourceSpecificPermissionGrant_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/permissionGrants/{resourceSpecificPermissionGrant_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_permission_grants(
+    def update_permission_grant(
         self,
-        team_id: str,
+        group_id: str,
         resourceSpecificPermissionGrant_id: str,
         id: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
@@ -6630,10 +6455,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property permissionGrants in teams
+        Update the navigation property permissionGrants in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             resourceSpecificPermissionGrant_id (string): resourceSpecificPermissionGrant-id
             id (string): The unique identifier for an entity. Read-only.
             deletedDateTime (string): Date and time when this object was deleted. Always null when the object hasn't been deleted.
@@ -6650,10 +6475,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.resourceSpecificPermissionGrant
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if resourceSpecificPermissionGrant_id is None:
             raise ValueError(
                 "Missing required parameter 'resourceSpecificPermissionGrant-id'."
@@ -6671,20 +6496,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/permissionGrants/{resourceSpecificPermissionGrant_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/permissionGrants/{resourceSpecificPermissionGrant_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_permission_grant(
-        self, team_id: str, resourceSpecificPermissionGrant_id: str
+    def delete_group_permission_grant(
+        self, group_id: str, resourceSpecificPermissionGrant_id: str
     ) -> Any:
         """
 
-        Delete navigation property permissionGrants for teams
+        Delete navigation property permissionGrants for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             resourceSpecificPermissionGrant_id (string): resourceSpecificPermissionGrant-id
 
         Returns:
@@ -6694,28 +6519,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.resourceSpecificPermissionGrant
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if resourceSpecificPermissionGrant_id is None:
             raise ValueError(
                 "Missing required parameter 'resourceSpecificPermissionGrant-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/permissionGrants/{resourceSpecificPermissionGrant_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/permissionGrants/{resourceSpecificPermissionGrant_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_permission_grants(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_group_permission_grants_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -6726,29 +6551,29 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.resourceSpecificPermissionGrant
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/permissionGrants/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/permissionGrants/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_profile_photo(
+    def get_group_team_picture(
         self,
-        team_id: str,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get profilePhoto
+        Get photo from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
@@ -6759,30 +6584,30 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.profilePhoto
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/photo"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/photo"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_photo(
+    def patch_group_team_photo(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         height: Optional[float] = None,
         width: Optional[float] = None,
     ) -> Any:
         """
 
-        Update profilePhoto
+        Update the navigation property photo in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             height (number): The height of the photo. Read-only.
             width (number): The width of the photo. Read-only.
@@ -6794,27 +6619,27 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.profilePhoto
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"id": id, "height": height, "width": width}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/photo"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/photo"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def get_profile_photo(self, team_id: str) -> Any:
+    def get_group_team_photo(self, group_id: str) -> Any:
         """
 
-        Get profilePhoto
+        Get media content for the navigation property photo from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Retrieved media content
@@ -6823,22 +6648,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.profilePhoto
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/photo/$value"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/photo/$value"
         query_params = {}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_photo_content(self, team_id: str, body_content: bytes) -> Any:
+    def put_group_team_photo_content(self, group_id: str, body_content: bytes) -> Any:
         """
 
-        Update profilePhoto
+        Update media content for the navigation property photo in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             body_content (bytes | None): Raw binary content for the request body.
 
         Returns:
@@ -6848,13 +6673,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.profilePhoto
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/photo/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/photo/$value"
         query_params = {}
         response = self._put(
             url,
@@ -6864,13 +6689,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_team_photo_content(self, team_id: str) -> Any:
+    def delete_group_team_photo(self, group_id: str) -> Any:
         """
 
-        Delete media content for the navigation property photo in teams
+        Delete media content for the navigation property photo in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -6879,27 +6704,27 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.profilePhoto
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/photo/$value"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/photo/$value"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_primary_team_channel(
+    def get_group_primary(
         self,
-        team_id: str,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get primaryChannel
+        Get primaryChannel from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
@@ -6910,20 +6735,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_primary_channel(
+    def patch_primary_channel(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         description: Optional[str] = None,
@@ -6944,10 +6769,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property primaryChannel in teams
+        Update the navigation property primaryChannel in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdDateTime (string): Read only. Timestamp at which the channel was created.
             description (string): Optional textual description for the channel.
@@ -6973,10 +6798,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -7000,18 +6825,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_primary_channel(self, team_id: str) -> Any:
+    def delete_primary_channel(self, group_id: str) -> Any:
         """
 
-        Delete navigation property primaryChannel for teams
+        Delete navigation property primaryChannel for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -7020,18 +6845,18 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_team_primary_channel_members(
+    def fetch_team_primary_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -7043,10 +6868,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get allMembers from teams
+        Get allMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -7063,13 +6888,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers"
-        )
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers"
         query_params = {
             k: v
             for k, v in [
@@ -7087,9 +6910,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_primary_channel_members(
+    def create_primary_channel_all_members(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
         roles: Optional[List[str]] = None,
@@ -7097,10 +6920,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to allMembers for teams
+        Create new navigation property to allMembers for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
             roles (array): The roles for that user. This property contains more qualifiers only when relevant - for example, if the member has owner privileges, the roles property contains owner as one of the values. Similarly, if the member is an in-tenant guest, the roles property contains guest as one of the values. A basic member shouldn't have any values specified in the roles property. An Out-of-tenant external member is assigned the owner role.
@@ -7113,10 +6936,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -7127,9 +6950,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers"
-        )
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers"
         query_params = {}
         response = self._post(
             url,
@@ -7139,19 +6960,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_primary_channel_members(
+    def get_group_primary_channel_member(
         self,
-        team_id: str,
+        group_id: str,
         conversationMember_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get allMembers from teams
+        Get allMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -7163,22 +6984,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_primary_channel_members(
+    def update_team_member(
         self,
-        team_id: str,
+        group_id: str,
         conversationMember_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -7187,10 +7008,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property allMembers in teams
+        Update the navigation property allMembers in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
@@ -7204,10 +7025,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         request_body_data = None
@@ -7220,20 +7041,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers/{conversationMember_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def remove_conversation_member(
-        self, team_id: str, conversationMember_id: str
+    def delete_primary_channel_member(
+        self, group_id: str, conversationMember_id: str
     ) -> Any:
         """
 
-        Delete navigation property allMembers for teams
+        Delete navigation property allMembers for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
 
         Returns:
@@ -7243,26 +7064,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers/{conversationMember_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_team_primary_channel_members(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_primary_channel_member_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -7273,26 +7094,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_primary_channel_all_members_act(
-        self, team_id: str, values: Optional[List[Any]] = None
+    def add_group_team_members(
+        self, group_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action add
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             values (array): values
 
         Returns:
@@ -7302,16 +7123,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"values": values}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers/microsoft.graph.add"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers/microsoft.graph.add"
         query_params = {}
         response = self._post(
             url,
@@ -7321,15 +7142,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_team_members(
-        self, team_id: str, values: Optional[List[Any]] = None
+    def remove_primary_channel_members(
+        self, group_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action remove
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             values (array): values
 
         Returns:
@@ -7339,16 +7160,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"values": values}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/allMembers/microsoft.graph.remove"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/allMembers/microsoft.graph.remove"
         query_params = {}
         response = self._post(
             url,
@@ -7358,18 +7179,18 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_files_folder(
+    def get_group_primary_channel_folder(
         self,
-        team_id: str,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get filesFolder from teams
+        Get filesFolder from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
@@ -7380,26 +7201,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/filesFolder"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/filesFolder"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_primary_channel_content(
-        self, team_id: str, format: Optional[str] = None
+    def get_primary_channel_files_content(
+        self, group_id: str, format: Optional[str] = None
     ) -> Any:
         """
 
-        Get content for the navigation property filesFolder from teams
+        Get content for the navigation property filesFolder from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             format (string): Format of the content
 
         Returns:
@@ -7409,22 +7230,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/filesFolder/content"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/filesFolder/content"
         query_params = {k: v for k, v in [("$format", format)] if v is not None}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def upload_team_folder_content(self, team_id: str, body_content: bytes) -> Any:
+    def update_primary_channel_content(self, group_id: str, body_content: bytes) -> Any:
         """
 
-        Update content for the navigation property filesFolder in teams
+        Update content for the navigation property filesFolder in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             body_content (bytes | None): Raw binary content for the request body.
 
         Returns:
@@ -7434,13 +7255,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/filesFolder/content"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/filesFolder/content"
         query_params = {}
         response = self._put(
             url,
@@ -7450,13 +7271,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_team_files_folder_content(self, team_id: str) -> Any:
+    def delete_group_files_folder_content(self, group_id: str) -> Any:
         """
 
-        Delete content for the navigation property filesFolder in teams
+        Delete content for the navigation property filesFolder in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -7465,18 +7286,18 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/filesFolder/content"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/filesFolder/content"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_primary_members(
+    def list_primary_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -7488,10 +7309,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get members from teams
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -7508,11 +7329,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members"
         query_params = {
             k: v
             for k, v in [
@@ -7530,9 +7351,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_channel_members(
+    def create_primary_channel_member_for_g(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
         roles: Optional[List[str]] = None,
@@ -7540,10 +7361,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to members for teams
+        Create new navigation property to members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
             roles (array): The roles for that user. This property contains more qualifiers only when relevant - for example, if the member has owner privileges, the roles property contains owner as one of the values. Similarly, if the member is an in-tenant guest, the roles property contains guest as one of the values. A basic member shouldn't have any values specified in the roles property. An Out-of-tenant external member is assigned the owner role.
@@ -7556,10 +7377,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -7570,7 +7391,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members"
         query_params = {}
         response = self._post(
             url,
@@ -7580,19 +7401,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_primary_channel_member_by_i(
+    def get_primary_channel_members(
         self,
-        team_id: str,
+        group_id: str,
         conversationMember_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get members from teams
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -7604,22 +7425,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_conversation_member_by_id(
+    def update_primary_channel_member(
         self,
-        team_id: str,
+        group_id: str,
         conversationMember_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -7628,10 +7449,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property members in teams
+        Update the navigation property members in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
@@ -7645,10 +7466,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         request_body_data = None
@@ -7661,20 +7482,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members/{conversationMember_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_primary_channel_member(
-        self, team_id: str, conversationMember_id: str
+    def delete_member_from_primary_channel(
+        self, group_id: str, conversationMember_id: str
     ) -> Any:
         """
 
-        Delete navigation property members for teams
+        Delete navigation property members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             conversationMember_id (string): conversationMember-id
 
         Returns:
@@ -7684,26 +7505,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members/{conversationMember_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_primary_channel_member_cou(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_primary_channel_members(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -7714,26 +7535,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_primary_channel_member(
-        self, team_id: str, values: Optional[List[Any]] = None
+    def add_primary_channel_member(
+        self, group_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action add
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             values (array): values
 
         Returns:
@@ -7743,16 +7564,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"values": values}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members/microsoft.graph.add"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members/microsoft.graph.add"
         query_params = {}
         response = self._post(
             url,
@@ -7762,15 +7583,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_team_primary_channel_member(
-        self, team_id: str, values: Optional[List[Any]] = None
+    def remove_group_team_member(
+        self, group_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
 
         Invoke action remove
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             values (array): values
 
         Returns:
@@ -7780,16 +7601,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {"values": values}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/members/microsoft.graph.remove"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/members/microsoft.graph.remove"
         query_params = {}
         response = self._post(
             url,
@@ -7799,9 +7620,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def list_team_primary_channel_messages(
+    def get_primary_channel_messages(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -7813,10 +7634,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get messages from teams
+        Get messages from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -7833,11 +7654,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages"
         query_params = {
             k: v
             for k, v in [
@@ -7855,9 +7676,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_message(
+    def post_primary_channel_message(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
         body: Optional[dict[str, dict[str, Any]]] = None,
@@ -7886,10 +7707,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to messages for teams
+        Create new navigation property to messages for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
             body (object): body
@@ -7923,10 +7744,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -7958,7 +7779,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages"
         query_params = {}
         response = self._post(
             url,
@@ -7968,19 +7789,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_primary_messages(
+    def get_primary_channel_message(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get messages from teams
+        Get messages from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -7992,22 +7813,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def patch_team_message_by_id(
+    def update_primary_channel_message(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         id: Optional[str] = None,
         attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
@@ -8037,10 +7858,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property messages in teams
+        Update the navigation property messages in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
@@ -8075,10 +7896,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
@@ -8112,18 +7933,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_message_by_id(self, team_id: str, chatMessage_id: str) -> Any:
+    def delete_primary_channel_message(self, group_id: str, chatMessage_id: str) -> Any:
         """
 
-        Delete navigation property messages for teams
+        Delete navigation property messages for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
 
         Returns:
@@ -8133,20 +7954,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_channel_msg_hosted(
+    def get_hosted_content_by_message_id(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -8159,10 +7980,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get hostedContents from teams
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -8180,13 +8001,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents"
         query_params = {
             k: v
             for k, v in [
@@ -8204,9 +8025,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def upload_hosted_content(
+    def add_hosted_content_to_group_message(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         id: Optional[str] = None,
         contentBytes: Optional[str] = None,
@@ -8214,10 +8035,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to hostedContents for teams
+        Create new navigation property to hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             id (string): The unique identifier for an entity. Read-only.
             contentBytes (string): Write only. Bytes for the hosted content (such as images).
@@ -8230,10 +8051,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
@@ -8245,7 +8066,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents"
         query_params = {}
         response = self._post(
             url,
@@ -8255,9 +8076,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def read_hosted_content(
+    def get_group_team_primary_channel_mess(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
         select: Optional[List[str]] = None,
@@ -8265,10 +8086,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get hostedContents from teams
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
             select (array): Select properties to be returned
@@ -8281,26 +8102,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessageHostedContent_id is None:
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def patch_pri_ch_hosted_content(
+    def patch_group_team_primary_channel_me(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
         id: Optional[str] = None,
@@ -8309,10 +8130,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property hostedContents in teams
+        Update the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
             id (string): The unique identifier for an entity. Read-only.
@@ -8326,10 +8147,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessageHostedContent_id is None:
@@ -8345,20 +8166,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def del_pri_ch_msg_hosted_content(
-        self, team_id: str, chatMessage_id: str, chatMessageHostedContent_id: str
+    def delete_message_hosted_content(
+        self, group_id: str, chatMessage_id: str, chatMessageHostedContent_id: str
     ) -> Any:
         """
 
-        Delete navigation property hostedContents for teams
+        Delete navigation property hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
 
@@ -8369,30 +8190,30 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessageHostedContent_id is None:
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_hosted_message_content_by_id(
-        self, team_id: str, chatMessage_id: str, chatMessageHostedContent_id: str
+    def get_group_team_primary_channel_msg_h(
+        self, group_id: str, chatMessage_id: str, chatMessageHostedContent_id: str
     ) -> Any:
         """
 
-        Get media content for the navigation property hostedContents from teams
+        Get media content for the navigation property hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
 
@@ -8403,34 +8224,34 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessageHostedContent_id is None:
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def put_pri_ch_hosted_content_val(
+    def update_group_team_primary_msg_hoste(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
         body_content: bytes,
     ) -> Any:
         """
 
-        Update media content for the navigation property hostedContents in teams
+        Update media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
             body_content (bytes | None): Raw binary content for the request body.
@@ -8442,10 +8263,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessageHostedContent_id is None:
@@ -8454,7 +8275,7 @@ class TeamsApi(APISegmentBase):
             )
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._put(
             url,
@@ -8464,15 +8285,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def del_pri_ch_msg_host_content_val(
-        self, team_id: str, chatMessage_id: str, chatMessageHostedContent_id: str
+    def delete_group_team_primary_channel_m(
+        self, group_id: str, chatMessage_id: str, chatMessageHostedContent_id: str
     ) -> Any:
         """
 
-        Delete media content for the navigation property hostedContents in teams
+        Delete media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
 
@@ -8483,24 +8304,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessageHostedContent_id is None:
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_hosted_contents_count(
+    def count_hosted_content(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -8510,7 +8331,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -8522,28 +8343,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/hostedContents/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/hostedContents/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def set_reaction_to_primary_channel_mes(
-        self, team_id: str, chatMessage_id: str, reactionType: Optional[str] = None
+    def set_reaction_to_chat_message(
+        self, group_id: str, chatMessage_id: str, reactionType: Optional[str] = None
     ) -> Any:
         """
 
         Invoke action setReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             reactionType (string): reactionType
 
@@ -8554,10 +8375,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
@@ -8565,7 +8386,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/microsoft.graph.setReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/microsoft.graph.setReaction"
         query_params = {}
         response = self._post(
             url,
@@ -8575,15 +8396,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def soft_delete_team_channel_message(
-        self, team_id: str, chatMessage_id: str
+    def soft_delete_group_channel_message(
+        self, group_id: str, chatMessage_id: str
     ) -> Any:
         """
 
         Invoke action softDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
 
         Returns:
@@ -8593,14 +8414,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/microsoft.graph.softDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/microsoft.graph.softDelete"
         query_params = {}
         response = self._post(
             url,
@@ -8610,13 +8431,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def teams_undo_soft_delete_message(self, team_id: str, chatMessage_id: str) -> Any:
+    def undo_soft_delete_chat_message(self, group_id: str, chatMessage_id: str) -> Any:
         """
 
         Invoke action undoSoftDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
 
         Returns:
@@ -8626,14 +8447,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/microsoft.graph.undoSoftDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/microsoft.graph.undoSoftDelete"
         query_params = {}
         response = self._post(
             url,
@@ -8643,15 +8464,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unset_reaction_by_message_id(
-        self, team_id: str, chatMessage_id: str, reactionType: Optional[str] = None
+    def unset_reaction_for_primary_channel(
+        self, group_id: str, chatMessage_id: str, reactionType: Optional[str] = None
     ) -> Any:
         """
 
         Invoke action unsetReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             reactionType (string): reactionType
 
@@ -8662,10 +8483,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
@@ -8673,7 +8494,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/microsoft.graph.unsetReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/microsoft.graph.unsetReaction"
         query_params = {}
         response = self._post(
             url,
@@ -8683,9 +8504,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def list_replies_by_message_id(
+    def get_primary_channel_replies(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -8698,10 +8519,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get replies from teams
+        Get replies from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -8719,13 +8540,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies"
         query_params = {
             k: v
             for k, v in [
@@ -8743,9 +8564,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_reply_to_chat_message(
+    def create_reply_to_message(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         id: Optional[str] = None,
         attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
@@ -8775,10 +8596,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to replies for teams
+        Create new navigation property to replies for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
@@ -8813,10 +8634,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
@@ -8850,7 +8671,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies"
         query_params = {}
         response = self._post(
             url,
@@ -8860,9 +8681,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_primary_channel_message_re(
+    def list_group_team_primary_channel_mes(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         select: Optional[List[str]] = None,
@@ -8870,10 +8691,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get replies from teams
+        Get replies from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             select (array): Select properties to be returned
@@ -8886,24 +8707,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_reply(
+    def update_primary_channel_reply(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         id: Optional[str] = None,
@@ -8934,10 +8755,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property replies in teams
+        Update the navigation property replies in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             id (string): The unique identifier for an entity. Read-only.
@@ -8973,10 +8794,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9012,20 +8833,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_reply(
-        self, team_id: str, chatMessage_id: str, chatMessage_id1: str
+    def delete_reply_message(
+        self, group_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
 
-        Delete navigation property replies for teams
+        Delete navigation property replies for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
 
@@ -9036,22 +8857,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_team_reply_hosted_contents_by_i(
+    def get_reply_contents(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         top: Optional[int] = None,
@@ -9065,10 +8886,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get hostedContents from teams
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             top (integer): Show only the first n items Example: '50'.
@@ -9087,15 +8908,15 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
         query_params = {
             k: v
             for k, v in [
@@ -9113,9 +8934,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_reply_hosted_content(
+    def create_reply_hosted_content(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         id: Optional[str] = None,
@@ -9124,10 +8945,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to hostedContents for teams
+        Create new navigation property to hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             id (string): The unique identifier for an entity. Read-only.
@@ -9141,10 +8962,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9158,7 +8979,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents"
         query_params = {}
         response = self._post(
             url,
@@ -9168,9 +8989,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_pri_ch_reply_hosted_content(
+    def get_hosted_content_reply(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
@@ -9179,10 +9000,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get hostedContents from teams
+        Get hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -9196,10 +9017,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9208,16 +9029,16 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def patch_pri_ch_reply_hosted_content(
+    def patch_group_team_msg_reply_hosted_co(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
@@ -9227,10 +9048,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property hostedContents in teams
+        Update the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -9245,10 +9066,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9266,24 +9087,24 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def del_pri_ch_reply_hosted_content(
+    def delete_group_team_primary_channel_r(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
     ) -> Any:
         """
 
-        Delete navigation property hostedContents for teams
+        Delete navigation property hostedContents for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -9295,10 +9116,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9307,24 +9128,24 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_pri_ch_reply_host_content_val(
+    def get_group_team_channel_msg_reply_hos(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
     ) -> Any:
         """
 
-        Get media content for the navigation property hostedContents from teams
+        Get media content for the navigation property hostedContents from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -9336,10 +9157,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9348,14 +9169,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def put_pri_ch_reply_hosted_content_val(
+    def update_group_team_primary_channel_m(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
@@ -9363,10 +9184,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update media content for the navigation property hostedContents in teams
+        Update media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -9379,10 +9200,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9393,7 +9214,7 @@ class TeamsApi(APISegmentBase):
             )
         request_body_data = None
         request_body_data = body_content
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._put(
             url,
@@ -9403,19 +9224,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def del_pri_ch_reply_host_cont_val(
+    def delete_group_team_primary_ch_reply_h(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
     ) -> Any:
         """
 
-        Delete media content for the navigation property hostedContents in teams
+        Delete media content for the navigation property hostedContents in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
@@ -9427,10 +9248,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9439,14 +9260,14 @@ class TeamsApi(APISegmentBase):
             raise ValueError(
                 "Missing required parameter 'chatMessageHostedContent-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/{chatMessageHostedContent_id}/$value"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_hosted_content_replies(
+    def get_group_team_primary_channel_repl(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         search: Optional[str] = None,
@@ -9457,7 +9278,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             search (string): Search items by search phrases
@@ -9470,24 +9291,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/hostedContents/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def set_reaction_to_reply(
+    def set_reply_reaction(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         reactionType: Optional[str] = None,
@@ -9497,7 +9318,7 @@ class TeamsApi(APISegmentBase):
         Invoke action setReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             reactionType (string): reactionType
@@ -9509,10 +9330,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9522,7 +9343,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.setReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.setReaction"
         query_params = {}
         response = self._post(
             url,
@@ -9532,15 +9353,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def soft_delete_reply_message(
-        self, team_id: str, chatMessage_id: str, chatMessage_id1: str
+    def soft_delete_group_message_reply(
+        self, group_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
 
         Invoke action softDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
 
@@ -9551,16 +9372,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.softDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.softDelete"
         query_params = {}
         response = self._post(
             url,
@@ -9570,15 +9391,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def undo_reply_soft_delete(
-        self, team_id: str, chatMessage_id: str, chatMessage_id1: str
+    def undo_soft_delete_chat_message_reply(
+        self, group_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
 
         Invoke action undoSoftDelete
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
 
@@ -9589,16 +9410,16 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.undoSoftDelete"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.undoSoftDelete"
         query_params = {}
         response = self._post(
             url,
@@ -9608,9 +9429,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unset_reply_reaction(
+    def unset_reaction_to_reply(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
         reactionType: Optional[str] = None,
@@ -9620,7 +9441,7 @@ class TeamsApi(APISegmentBase):
         Invoke action unsetReaction
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             reactionType (string): reactionType
@@ -9632,10 +9453,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         if chatMessage_id1 is None:
@@ -9645,7 +9466,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.unsetReaction"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.unsetReaction"
         query_params = {}
         response = self._post(
             url,
@@ -9655,9 +9476,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_primary_channel_replies_count(
+    def count_primary_channel_replies(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -9667,7 +9488,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -9679,22 +9500,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_delta_replies(
+    def get_primary_channel_replies_delta(
         self,
-        team_id: str,
+        group_id: str,
         chatMessage_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -9710,7 +9531,7 @@ class TeamsApi(APISegmentBase):
         Invoke function delta
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             chatMessage_id (string): chatMessage-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -9728,13 +9549,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/{chatMessage_id}/replies/microsoft.graph.delta()"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/{chatMessage_id}/replies/microsoft.graph.delta()"
         query_params = {
             k: v
             for k, v in [
@@ -9752,15 +9573,15 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_primary_channel_message_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_primary_channel_messages(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -9771,20 +9592,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_primary_channel_messages(
+    def get_primary_channel_messages_delta(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -9799,7 +9620,7 @@ class TeamsApi(APISegmentBase):
         Invoke function delta
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -9816,11 +9637,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/messages/microsoft.graph.delta()"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/messages/microsoft.graph.delta()"
         query_params = {
             k: v
             for k, v in [
@@ -9838,15 +9659,15 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def archive_team_primary_channel(
-        self, team_id: str, shouldSetSpoSiteReadOnlyForMembers: Optional[bool] = None
+    def archive_primary_channel(
+        self, group_id: str, shouldSetSpoSiteReadOnlyForMembers: Optional[bool] = None
     ) -> Any:
         """
 
         Invoke action archive
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             shouldSetSpoSiteReadOnlyForMembers (boolean): shouldSetSpoSiteReadOnlyForMembers
 
         Returns:
@@ -9856,10 +9677,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "shouldSetSpoSiteReadOnlyForMembers": shouldSetSpoSiteReadOnlyForMembers
@@ -9867,7 +9688,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/microsoft.graph.archive"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/microsoft.graph.archive"
         query_params = {}
         response = self._post(
             url,
@@ -9877,13 +9698,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def complete_team_migration(self, team_id: str) -> Any:
+    def complete_group_migration(self, group_id: str) -> Any:
         """
 
         Invoke action completeMigration
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -9892,12 +9713,12 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/microsoft.graph.completeMigration"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/microsoft.graph.completeMigration"
         query_params = {}
         response = self._post(
             url,
@@ -9907,9 +9728,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def check_user_access_in_channel(
+    def check_user_access_to_group(
         self,
-        team_id: str,
+        group_id: str,
         userId: Optional[str] = None,
         tenantId: Optional[str] = None,
         userPrincipalName: Optional[str] = None,
@@ -9919,7 +9740,7 @@ class TeamsApi(APISegmentBase):
         Invoke function doesUserHaveAccess
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             userId (string): Usage: userId='@userId'
             tenantId (string): Usage: tenantId='@tenantId'
             userPrincipalName (string): Usage: userPrincipalName='@userPrincipalName'
@@ -9931,11 +9752,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/microsoft.graph.doesUserHaveAccess(userId='@userId',tenantId='@tenantId',userPrincipalName='@userPrincipalName')"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/microsoft.graph.doesUserHaveAccess(userId='@userId',tenantId='@tenantId',userPrincipalName='@userPrincipalName')"
         query_params = {
             k: v
             for k, v in [
@@ -9948,13 +9769,13 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def provision_team_email(self, team_id: str) -> dict[str, Any]:
+    def provision_primary_email(self, group_id: str) -> dict[str, Any]:
         """
 
         Invoke action provisionEmail
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             dict[str, Any]: Success
@@ -9963,12 +9784,12 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/microsoft.graph.provisionEmail"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/microsoft.graph.provisionEmail"
         query_params = {}
         response = self._post(
             url,
@@ -9978,13 +9799,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def remove_primary_team_email(self, team_id: str) -> Any:
+    def remove_primary_channel_email(self, group_id: str) -> Any:
         """
 
         Invoke action removeEmail
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -9993,12 +9814,12 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/microsoft.graph.removeEmail"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/microsoft.graph.removeEmail"
         query_params = {}
         response = self._post(
             url,
@@ -10008,13 +9829,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unarchive_team_primary_channel(self, team_id: str) -> Any:
+    def unarchive_primary_channel(self, group_id: str) -> Any:
         """
 
         Invoke action unarchive
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -10023,12 +9844,12 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/microsoft.graph.unarchive"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/microsoft.graph.unarchive"
         query_params = {}
         response = self._post(
             url,
@@ -10038,9 +9859,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def list_primary_channel_shared_teams(
+    def get_shared_with_teams(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -10052,10 +9873,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get sharedWithTeams from teams
+        Get sharedWithTeams from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -10072,11 +9893,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams"
         query_params = {
             k: v
             for k, v in [
@@ -10094,9 +9915,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def share_primary_channel_with_teams(
+    def share_primary_channel_teams(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
         tenantId: Optional[str] = None,
@@ -10106,10 +9927,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to sharedWithTeams for teams
+        Create new navigation property to sharedWithTeams for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The name of the team.
             tenantId (string): The ID of the Microsoft Entra tenant.
@@ -10124,10 +9945,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -10140,7 +9961,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams"
         query_params = {}
         response = self._post(
             url,
@@ -10150,19 +9971,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_shared_channel_info_by_id(
+    def get_shared_channel_teams(
         self,
-        team_id: str,
+        group_id: str,
         sharedWithChannelTeamInfo_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get sharedWithTeams from teams
+        Get sharedWithTeams from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -10174,24 +9995,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_shared_channel_team_info(
+    def update_shared_team_channel_info(
         self,
-        team_id: str,
+        group_id: str,
         sharedWithChannelTeamInfo_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -10202,10 +10023,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property sharedWithTeams in teams
+        Update the navigation property sharedWithTeams in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The name of the team.
@@ -10221,10 +10042,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
@@ -10241,20 +10062,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def remove_shared_with_team(
-        self, team_id: str, sharedWithChannelTeamInfo_id: str
+    def remove_group_team_primary_channel_s(
+        self, group_id: str, sharedWithChannelTeamInfo_id: str
     ) -> Any:
         """
 
-        Delete navigation property sharedWithTeams for teams
+        Delete navigation property sharedWithTeams for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
 
         Returns:
@@ -10264,22 +10085,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_shared_members(
+    def list_allowed_members_in_shared_chan(
         self,
-        team_id: str,
+        group_id: str,
         sharedWithChannelTeamInfo_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -10292,10 +10113,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get allowedMembers from teams
+        Get allowedMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -10313,15 +10134,15 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers"
         query_params = {
             k: v
             for k, v in [
@@ -10339,9 +10160,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_channel_shared_member_by_id(
+    def get_channel_team_allowed_member(
         self,
-        team_id: str,
+        group_id: str,
         sharedWithChannelTeamInfo_id: str,
         conversationMember_id: str,
         select: Optional[List[str]] = None,
@@ -10349,10 +10170,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get allowedMembers from teams
+        Get allowedMembers from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             conversationMember_id (string): conversationMember-id
             select (array): Select properties to be returned
@@ -10365,26 +10186,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
         if conversationMember_id is None:
             raise ValueError("Missing required parameter 'conversationMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/{conversationMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/{conversationMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def count_shared_team_members(
+    def count_allowed_members(
         self,
-        team_id: str,
+        group_id: str,
         sharedWithChannelTeamInfo_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -10394,7 +10215,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -10406,34 +10227,34 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_shared_channel_team_info_team(
+    def get_shared_channel_team_info(
         self,
-        team_id: str,
+        group_id: str,
         sharedWithChannelTeamInfo_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get team from teams
+        Get team from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             sharedWithChannelTeamInfo_id (string): sharedWithChannelTeamInfo-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -10445,30 +10266,30 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if sharedWithChannelTeamInfo_id is None:
             raise ValueError(
                 "Missing required parameter 'sharedWithChannelTeamInfo-id'."
             )
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/team"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/{sharedWithChannelTeamInfo_id}/team"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_primary_channel_shared_with_tea(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_shared_teams_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -10479,20 +10300,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/sharedWithTeams/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/sharedWithTeams/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_tabs(
+    def list_group_team_primary_channel_tab(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -10504,10 +10325,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get tabs from teams
+        Get tabs from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -10524,11 +10345,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs"
         query_params = {
             k: v
             for k, v in [
@@ -10546,9 +10367,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_tab(
+    def create_primary_channel_tab(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         configuration: Optional[dict[str, dict[str, Any]]] = None,
         displayName: Optional[str] = None,
@@ -10557,10 +10378,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to tabs for teams
+        Create new navigation property to tabs for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             configuration (object): configuration
             displayName (string): Name of the tab.
@@ -10574,10 +10395,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -10589,7 +10410,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs"
         query_params = {}
         response = self._post(
             url,
@@ -10599,19 +10420,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_primary_tabs(
+    def get_primary_channel_tab(
         self,
-        team_id: str,
+        group_id: str,
         teamsTab_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get tabs from teams
+        Get tabs from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsTab_id (string): teamsTab-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -10623,22 +10444,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs/{teamsTab_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs/{teamsTab_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_tab(
+    def update_primary_channel_tab(
         self,
-        team_id: str,
+        group_id: str,
         teamsTab_id: str,
         id: Optional[str] = None,
         configuration: Optional[dict[str, dict[str, Any]]] = None,
@@ -10648,10 +10469,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property tabs in teams
+        Update the navigation property tabs in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsTab_id (string): teamsTab-id
             id (string): The unique identifier for an entity. Read-only.
             configuration (object): configuration
@@ -10666,10 +10487,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
         request_body_data = None
@@ -10683,18 +10504,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs/{teamsTab_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs/{teamsTab_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_tab(self, team_id: str, teamsTab_id: str) -> Any:
+    def delete_primary_channel_tab(self, group_id: str, teamsTab_id: str) -> Any:
         """
 
-        Delete navigation property tabs for teams
+        Delete navigation property tabs for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsTab_id (string): teamsTab-id
 
         Returns:
@@ -10704,30 +10525,30 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs/{teamsTab_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs/{teamsTab_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_teams_app_by_tab_id(
+    def get_primary_channel_tabs_app(
         self,
-        team_id: str,
+        group_id: str,
         teamsTab_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get teamsApp from teams
+        Get teamsApp from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamsTab_id (string): teamsTab-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -10739,28 +10560,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamsTab_id is None:
             raise ValueError("Missing required parameter 'teamsTab-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs/{teamsTab_id}/teamsApp"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs/{teamsTab_id}/teamsApp"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_primary_channel_tabs_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_primary_channel_tabs(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -10771,29 +10592,29 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/primaryChannel/tabs/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/primaryChannel/tabs/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_schedule(
+    def get_group_schedule(
         self,
-        team_id: str,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get schedule
+        Get schedule from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
@@ -10804,20 +10625,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_schedule(
+    def update_group_schedule(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         enabled: Optional[bool] = None,
         isActivitiesIncludedWhenCopyingShiftsEnabled: Optional[bool] = None,
@@ -10846,10 +10667,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create or replace schedule
+        Update the navigation property schedule in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             enabled (boolean): Indicates whether the schedule is enabled for the team. Required.
             isActivitiesIncludedWhenCopyingShiftsEnabled (boolean): Indicates whether copied shifts include activities from the original shift.
@@ -10883,10 +10704,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -10918,7 +10739,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule"
         query_params = {}
         response = self._put(
             url,
@@ -10928,13 +10749,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_team_schedule(self, team_id: str) -> Any:
+    def delete_group_schedule(self, group_id: str) -> Any:
         """
 
-        Delete navigation property schedule for teams
+        Delete navigation property schedule for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
 
         Returns:
             Any: Success
@@ -10943,18 +10764,18 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_day_notes(
+    def get_group_day_notes(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -10966,10 +10787,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        Get dayNotes from teams
+        Get dayNotes from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -10986,11 +10807,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/dayNotes"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = (
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/dayNotes"
+        )
         query_params = {
             k: v
             for k, v in [
@@ -11008,9 +10831,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_schedule_day_note(
+    def add_day_notes_to_group_team_schedule(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -11022,10 +10845,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to dayNotes for teams
+        Create new navigation property to dayNotes for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -11042,10 +10865,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -11060,7 +10883,9 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/dayNotes"
+        url = (
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/dayNotes"
+        )
         query_params = {}
         response = self._post(
             url,
@@ -11070,19 +10895,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_schedule_day_note(
+    def get_group_team_day_notes(
         self,
-        team_id: str,
+        group_id: str,
         dayNote_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get dayNotes from teams
+        Get dayNotes from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             dayNote_id (string): dayNote-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -11094,22 +10919,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if dayNote_id is None:
             raise ValueError("Missing required parameter 'dayNote-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/dayNotes/{dayNote_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/dayNotes/{dayNote_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_day_note(
+    def update_day_note(
         self,
-        team_id: str,
+        group_id: str,
         dayNote_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -11122,10 +10947,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property dayNotes in teams
+        Update the navigation property dayNotes in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             dayNote_id (string): dayNote-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -11143,10 +10968,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if dayNote_id is None:
             raise ValueError("Missing required parameter 'dayNote-id'.")
         request_body_data = None
@@ -11163,18 +10988,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/dayNotes/{dayNote_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/dayNotes/{dayNote_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_day_note(self, team_id: str, dayNote_id: str) -> Any:
+    def delete_day_note_by_id(self, group_id: str, dayNote_id: str) -> Any:
         """
 
-        Delete navigation property dayNotes for teams
+        Delete navigation property dayNotes for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             dayNote_id (string): dayNote-id
 
         Returns:
@@ -11184,26 +11009,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if dayNote_id is None:
             raise ValueError("Missing required parameter 'dayNote-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/dayNotes/{dayNote_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/dayNotes/{dayNote_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_schedule_day_notes_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_group_day_note_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -11214,22 +11039,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/dayNotes/$count"
-        )
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/dayNotes/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def share_team_schedule_action(
+    def share_team_schedule(
         self,
-        team_id: str,
+        group_id: str,
         notifyTeam: Optional[bool] = None,
         startDateTime: Optional[str] = None,
         endDateTime: Optional[str] = None,
@@ -11239,7 +11062,7 @@ class TeamsApi(APISegmentBase):
         Invoke action share
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             notifyTeam (boolean): notifyTeam
             startDateTime (string): startDateTime
             endDateTime (string): endDateTime
@@ -11251,10 +11074,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "notifyTeam": notifyTeam,
@@ -11264,7 +11087,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/microsoft.graph.share"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/microsoft.graph.share"
         query_params = {}
         response = self._post(
             url,
@@ -11274,9 +11097,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_shift_requests(
+    def list_group_shift_requests(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -11288,10 +11111,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List offerShiftRequest
+        Get offerShiftRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -11308,11 +11131,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/offerShiftRequests"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/offerShiftRequests"
         query_params = {
             k: v
             for k, v in [
@@ -11330,9 +11153,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def offer_shift_requests(
+    def offer_shift_requests_to_group(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -11353,10 +11176,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create offerShiftRequest
+        Create new navigation property to offerShiftRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -11382,10 +11205,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -11409,7 +11232,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/offerShiftRequests"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/offerShiftRequests"
         query_params = {}
         response = self._post(
             url,
@@ -11419,19 +11242,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_schedule_offer_shifts(
+    def get_offer_shift_request_details(
         self,
-        team_id: str,
+        group_id: str,
         offerShiftRequest_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get offerShiftRequest
+        Get offerShiftRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             offerShiftRequest_id (string): offerShiftRequest-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -11443,22 +11266,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if offerShiftRequest_id is None:
             raise ValueError("Missing required parameter 'offerShiftRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/offerShiftRequests/{offerShiftRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/offerShiftRequests/{offerShiftRequest_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def patch_offer_shift_request(
+    def update_offer_shift_request(
         self,
-        team_id: str,
+        group_id: str,
         offerShiftRequest_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -11480,10 +11303,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property offerShiftRequests in teams
+        Update the navigation property offerShiftRequests in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             offerShiftRequest_id (string): offerShiftRequest-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -11510,10 +11333,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if offerShiftRequest_id is None:
             raise ValueError("Missing required parameter 'offerShiftRequest-id'.")
         request_body_data = None
@@ -11539,20 +11362,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/offerShiftRequests/{offerShiftRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/offerShiftRequests/{offerShiftRequest_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_shift_offer_request(
-        self, team_id: str, offerShiftRequest_id: str
+    def delete_group_team_schedule_offer_sh(
+        self, group_id: str, offerShiftRequest_id: str
     ) -> Any:
         """
 
-        Delete navigation property offerShiftRequests for teams
+        Delete navigation property offerShiftRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             offerShiftRequest_id (string): offerShiftRequest-id
 
         Returns:
@@ -11562,26 +11385,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if offerShiftRequest_id is None:
             raise ValueError("Missing required parameter 'offerShiftRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/offerShiftRequests/{offerShiftRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/offerShiftRequests/{offerShiftRequest_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_shift_offer_requests(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_group_shift_requests(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -11592,20 +11415,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/offerShiftRequests/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/offerShiftRequests/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_open_shift_requests(
+    def list_group_team_open_shift_change_re(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -11617,10 +11440,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List openShiftChangeRequests
+        Get openShiftChangeRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -11637,11 +11460,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShiftChangeRequests"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShiftChangeRequests"
         query_params = {
             k: v
             for k, v in [
@@ -11659,9 +11482,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_open_shift_change_requests(
+    def create_open_shift_change_request(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -11679,10 +11502,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create openShiftChangeRequest
+        Create new navigation property to openShiftChangeRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -11705,10 +11528,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -11729,7 +11552,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShiftChangeRequests"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShiftChangeRequests"
         query_params = {}
         response = self._post(
             url,
@@ -11739,19 +11562,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_open_shift_change_request_by_id(
+    def get_open_shift_change_request(
         self,
-        team_id: str,
+        group_id: str,
         openShiftChangeRequest_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get openShiftChangeRequest
+        Get openShiftChangeRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             openShiftChangeRequest_id (string): openShiftChangeRequest-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -11763,22 +11586,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if openShiftChangeRequest_id is None:
             raise ValueError("Missing required parameter 'openShiftChangeRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShiftChangeRequests/{openShiftChangeRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShiftChangeRequests/{openShiftChangeRequest_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def patch_open_shift_change_request_by_i(
+    def patch_group_team_open_shift_change_r(
         self,
-        team_id: str,
+        group_id: str,
         openShiftChangeRequest_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -11797,10 +11620,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property openShiftChangeRequests in teams
+        Update the navigation property openShiftChangeRequests in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             openShiftChangeRequest_id (string): openShiftChangeRequest-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -11824,10 +11647,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if openShiftChangeRequest_id is None:
             raise ValueError("Missing required parameter 'openShiftChangeRequest-id'.")
         request_body_data = None
@@ -11850,20 +11673,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShiftChangeRequests/{openShiftChangeRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShiftChangeRequests/{openShiftChangeRequest_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def remove_open_shift_change_request(
-        self, team_id: str, openShiftChangeRequest_id: str
+    def delete_open_shift_change_request(
+        self, group_id: str, openShiftChangeRequest_id: str
     ) -> Any:
         """
 
-        Delete navigation property openShiftChangeRequests for teams
+        Delete navigation property openShiftChangeRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             openShiftChangeRequest_id (string): openShiftChangeRequest-id
 
         Returns:
@@ -11873,26 +11696,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if openShiftChangeRequest_id is None:
             raise ValueError("Missing required parameter 'openShiftChangeRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShiftChangeRequests/{openShiftChangeRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShiftChangeRequests/{openShiftChangeRequest_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_open_shift_change_requests(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_open_shift_requests(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -11903,20 +11726,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShiftChangeRequests/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShiftChangeRequests/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_team_open_shifts(
+    def get_open_shifts(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -11928,10 +11751,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List openShifts
+        Get openShifts from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -11948,11 +11771,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShifts"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShifts"
         query_params = {
             k: v
             for k, v in [
@@ -11970,9 +11793,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_open_shift_for_team_schedule(
+    def open_shifts_in_group(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -11985,10 +11808,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create openShift
+        Create new navigation property to openShifts for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -12006,10 +11829,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -12025,7 +11848,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShifts"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShifts"
         query_params = {}
         response = self._post(
             url,
@@ -12035,19 +11858,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_open_shift_by_team_id(
+    def get_open_shift_details(
         self,
-        team_id: str,
+        group_id: str,
         openShift_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get openShift
+        Get openShifts from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             openShift_id (string): openShift-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -12059,22 +11882,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if openShift_id is None:
             raise ValueError("Missing required parameter 'openShift-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShifts/{openShift_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShifts/{openShift_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_open_shift_details(
+    def update_open_shift(
         self,
-        team_id: str,
+        group_id: str,
         openShift_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -12088,10 +11911,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update openShift
+        Update the navigation property openShifts in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             openShift_id (string): openShift-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -12110,10 +11933,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if openShift_id is None:
             raise ValueError("Missing required parameter 'openShift-id'.")
         request_body_data = None
@@ -12131,18 +11954,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShifts/{openShift_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShifts/{openShift_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_open_shift(self, team_id: str, openShift_id: str) -> Any:
+    def delete_open_shift_by_id(self, group_id: str, openShift_id: str) -> Any:
         """
 
-        Delete openShift
+        Delete navigation property openShifts for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             openShift_id (string): openShift-id
 
         Returns:
@@ -12152,26 +11975,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if openShift_id is None:
             raise ValueError("Missing required parameter 'openShift-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShifts/{openShift_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShifts/{openShift_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_open_shifts(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_open_shifts_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -12182,20 +12005,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/openShifts/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/openShifts/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_scheduling_groups(
+    def get_group_scheduling_groups(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -12207,10 +12030,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List scheduleGroups
+        Get schedulingGroups from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -12227,13 +12050,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/schedulingGroups"
-        )
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/schedulingGroups"
         query_params = {
             k: v
             for k, v in [
@@ -12251,9 +12072,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_scheduling_group_for_team(
+    def create_scheduling_group(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -12266,10 +12087,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create schedulingGroup
+        Create new navigation property to schedulingGroups for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -12287,10 +12108,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -12306,9 +12127,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/schedulingGroups"
-        )
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/schedulingGroups"
         query_params = {}
         response = self._post(
             url,
@@ -12318,19 +12137,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_schedule_scheduling_group(
+    def get_scheduling_group_details(
         self,
-        team_id: str,
+        group_id: str,
         schedulingGroup_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get schedulingGroup
+        Get schedulingGroups from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             schedulingGroup_id (string): schedulingGroup-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -12342,22 +12161,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if schedulingGroup_id is None:
             raise ValueError("Missing required parameter 'schedulingGroup-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/schedulingGroups/{schedulingGroup_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/schedulingGroups/{schedulingGroup_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def replace_scheduling_group_in_team_sc(
+    def patch_group_team_schedule_scheduli(
         self,
-        team_id: str,
+        group_id: str,
         schedulingGroup_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -12371,10 +12190,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Replace schedulingGroup
+        Update the navigation property schedulingGroups in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             schedulingGroup_id (string): schedulingGroup-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -12393,10 +12212,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if schedulingGroup_id is None:
             raise ValueError("Missing required parameter 'schedulingGroup-id'.")
         request_body_data = None
@@ -12414,20 +12233,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/schedulingGroups/{schedulingGroup_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/schedulingGroups/{schedulingGroup_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_scheduling_group_by_id(
-        self, team_id: str, schedulingGroup_id: str
+    def delete_group_team_scheduling_group(
+        self, group_id: str, schedulingGroup_id: str
     ) -> Any:
         """
 
-        Delete schedulingGroup
+        Delete navigation property schedulingGroups for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             schedulingGroup_id (string): schedulingGroup-id
 
         Returns:
@@ -12437,26 +12256,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if schedulingGroup_id is None:
             raise ValueError("Missing required parameter 'schedulingGroup-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/schedulingGroups/{schedulingGroup_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/schedulingGroups/{schedulingGroup_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_scheduling_groups(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def count_scheduling_groups_for_team(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -12467,20 +12286,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/schedulingGroups/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/schedulingGroups/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_shifts(
+    def get_group_team_shifts(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -12492,10 +12311,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List shifts
+        Get shifts from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -12512,11 +12331,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/shifts"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/shifts"
         query_params = {
             k: v
             for k, v in [
@@ -12534,9 +12353,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_schedule_shift(
+    def schedule_group_shifts(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -12550,10 +12369,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create shift
+        Create new navigation property to shifts for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -12572,10 +12391,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -12592,7 +12411,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/shifts"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/shifts"
         query_params = {}
         response = self._post(
             url,
@@ -12602,19 +12421,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_shift(
+    def get_group_shifts(
         self,
-        team_id: str,
+        group_id: str,
         shift_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get shift
+        Get shifts from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             shift_id (string): shift-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -12626,22 +12445,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if shift_id is None:
             raise ValueError("Missing required parameter 'shift-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/shifts/{shift_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/shifts/{shift_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def replace_shift(
+    def update_shift_details(
         self,
-        team_id: str,
+        group_id: str,
         shift_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -12656,10 +12475,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Replace shift
+        Update the navigation property shifts in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             shift_id (string): shift-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -12679,10 +12498,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if shift_id is None:
             raise ValueError("Missing required parameter 'shift-id'.")
         request_body_data = None
@@ -12701,18 +12520,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/shifts/{shift_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/shifts/{shift_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_shift_by_team_id(self, team_id: str, shift_id: str) -> Any:
+    def delete_group_team_shift_by_id(self, group_id: str, shift_id: str) -> Any:
         """
 
-        Delete shift
+        Delete navigation property shifts for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             shift_id (string): shift-id
 
         Returns:
@@ -12722,26 +12541,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if shift_id is None:
             raise ValueError("Missing required parameter 'shift-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/shifts/{shift_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/shifts/{shift_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_shift_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_shifts_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -12752,20 +12571,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/shifts/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/shifts/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_swap_shift_change_requests(
+    def get_swap_shift_change_requests(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -12777,10 +12596,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List swapShiftsChangeRequest
+        Get swapShiftsChangeRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -12797,11 +12616,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/swapShiftsChangeRequests"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/swapShiftsChangeRequests"
         query_params = {
             k: v
             for k, v in [
@@ -12819,9 +12638,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def swap_shifts_change_request(
+    def swap_shift_requests(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -12843,10 +12662,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create swapShiftsChangeRequest
+        Create new navigation property to swapShiftsChangeRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -12873,10 +12692,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -12901,7 +12720,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/swapShiftsChangeRequests"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/swapShiftsChangeRequests"
         query_params = {}
         response = self._post(
             url,
@@ -12911,19 +12730,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def swap_shift_request_read(
+    def get_swap_shifts_change_request_by_id(
         self,
-        team_id: str,
+        group_id: str,
         swapShiftsChangeRequest_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get swapShiftsChangeRequest
+        Get swapShiftsChangeRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             swapShiftsChangeRequest_id (string): swapShiftsChangeRequest-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -12935,22 +12754,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if swapShiftsChangeRequest_id is None:
             raise ValueError("Missing required parameter 'swapShiftsChangeRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/swapShiftsChangeRequests/{swapShiftsChangeRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/swapShiftsChangeRequests/{swapShiftsChangeRequest_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_swap_shift_request(
+    def update_swap_shifts_change_request(
         self,
-        team_id: str,
+        group_id: str,
         swapShiftsChangeRequest_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -12973,10 +12792,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property swapShiftsChangeRequests in teams
+        Update the navigation property swapShiftsChangeRequests in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             swapShiftsChangeRequest_id (string): swapShiftsChangeRequest-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -13004,10 +12823,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if swapShiftsChangeRequest_id is None:
             raise ValueError("Missing required parameter 'swapShiftsChangeRequest-id'.")
         request_body_data = None
@@ -13034,20 +12853,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/swapShiftsChangeRequests/{swapShiftsChangeRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/swapShiftsChangeRequests/{swapShiftsChangeRequest_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_swap_shifts_change_request(
-        self, team_id: str, swapShiftsChangeRequest_id: str
+    def delete_swap_shift_request(
+        self, group_id: str, swapShiftsChangeRequest_id: str
     ) -> Any:
         """
 
-        Delete navigation property swapShiftsChangeRequests for teams
+        Delete navigation property swapShiftsChangeRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             swapShiftsChangeRequest_id (string): swapShiftsChangeRequest-id
 
         Returns:
@@ -13057,26 +12876,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if swapShiftsChangeRequest_id is None:
             raise ValueError("Missing required parameter 'swapShiftsChangeRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/swapShiftsChangeRequests/{swapShiftsChangeRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/swapShiftsChangeRequests/{swapShiftsChangeRequest_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def count_swap_shift_requests(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_group_swap_shifts_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -13087,20 +12906,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/swapShiftsChangeRequests/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/swapShiftsChangeRequests/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_team_time_cards(
+    def get_group_time_cards(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -13112,10 +12931,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List timeCard
+        Get timeCards from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -13132,11 +12951,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = (
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards"
+        )
         query_params = {
             k: v
             for k, v in [
@@ -13154,9 +12975,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_schedule_time_card(
+    def create_time_card_for_group(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -13173,10 +12994,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create timeCard
+        Create new navigation property to timeCards for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -13198,10 +13019,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -13221,7 +13042,9 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards"
+        url = (
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards"
+        )
         query_params = {}
         response = self._post(
             url,
@@ -13231,19 +13054,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_time_cards(
+    def get_group_time_card_schedule(
         self,
-        team_id: str,
+        group_id: str,
         timeCard_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get timeCards from teams
+        Get timeCards from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -13255,22 +13078,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_schedule_time_card_by_id(
+    def update_time_card(
         self,
-        team_id: str,
+        group_id: str,
         timeCard_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -13288,10 +13111,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property timeCards in teams
+        Update the navigation property timeCards in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -13314,10 +13137,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
         request_body_data = None
@@ -13339,18 +13162,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_time_card_by_id(self, team_id: str, timeCard_id: str) -> Any:
+    def delete_time_card(self, group_id: str, timeCard_id: str) -> Any:
         """
 
-        Delete timeCard
+        Delete navigation property timeCards for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
 
         Returns:
@@ -13360,20 +13183,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def clock_out_time_card_for_team_by_id(
+    def clock_out_time_card(
         self,
-        team_id: str,
+        group_id: str,
         timeCard_id: str,
         isAtApprovedLocation: Optional[bool] = None,
         notes: Optional[dict[str, dict[str, Any]]] = None,
@@ -13383,7 +13206,7 @@ class TeamsApi(APISegmentBase):
         Invoke action clockOut
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
             isAtApprovedLocation (boolean): isAtApprovedLocation
             notes (object): notes
@@ -13395,10 +13218,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
         request_body_data = None
@@ -13409,7 +13232,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}/microsoft.graph.clockOut"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}/microsoft.graph.clockOut"
         query_params = {}
         response = self._post(
             url,
@@ -13419,13 +13242,13 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def confirm_team_time_card(self, team_id: str, timeCard_id: str) -> Any:
+    def confirm_time_card(self, group_id: str, timeCard_id: str) -> Any:
         """
 
         Invoke action confirm
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
 
         Returns:
@@ -13435,14 +13258,14 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}/microsoft.graph.confirm"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}/microsoft.graph.confirm"
         query_params = {}
         response = self._post(
             url,
@@ -13452,9 +13275,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def end_time_card_break(
+    def end_break_time_card(
         self,
-        team_id: str,
+        group_id: str,
         timeCard_id: str,
         isAtApprovedLocation: Optional[bool] = None,
         notes: Optional[dict[str, dict[str, Any]]] = None,
@@ -13464,7 +13287,7 @@ class TeamsApi(APISegmentBase):
         Invoke action endBreak
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
             isAtApprovedLocation (boolean): isAtApprovedLocation
             notes (object): notes
@@ -13476,10 +13299,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
         request_body_data = None
@@ -13490,7 +13313,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}/microsoft.graph.endBreak"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}/microsoft.graph.endBreak"
         query_params = {}
         response = self._post(
             url,
@@ -13500,9 +13323,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def start_break_time_card(
+    def start_group_team_time_card_break(
         self,
-        team_id: str,
+        group_id: str,
         timeCard_id: str,
         isAtApprovedLocation: Optional[bool] = None,
         notes: Optional[dict[str, dict[str, Any]]] = None,
@@ -13512,7 +13335,7 @@ class TeamsApi(APISegmentBase):
         Invoke action startBreak
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeCard_id (string): timeCard-id
             isAtApprovedLocation (boolean): isAtApprovedLocation
             notes (object): notes
@@ -13524,10 +13347,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeCard_id is None:
             raise ValueError("Missing required parameter 'timeCard-id'.")
         request_body_data = None
@@ -13538,7 +13361,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/{timeCard_id}/microsoft.graph.startBreak"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/{timeCard_id}/microsoft.graph.startBreak"
         query_params = {}
         response = self._post(
             url,
@@ -13548,15 +13371,15 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_time_cards_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_team_schedule_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -13567,22 +13390,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/$count"
-        )
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def clock_in_time_card(
+    def clock_in_team_schedule(
         self,
-        team_id: str,
+        group_id: str,
         isAtApprovedLocation: Optional[bool] = None,
         notes: Optional[dict[str, dict[str, Any]]] = None,
     ) -> Any:
@@ -13591,7 +13412,7 @@ class TeamsApi(APISegmentBase):
         Invoke action clockIn
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             isAtApprovedLocation (boolean): isAtApprovedLocation
             notes (object): notes
 
@@ -13602,10 +13423,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "isAtApprovedLocation": isAtApprovedLocation,
@@ -13614,7 +13435,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeCards/microsoft.graph.clockIn"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeCards/microsoft.graph.clockIn"
         query_params = {}
         response = self._post(
             url,
@@ -13624,9 +13445,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def list_team_time_off_reasons(
+    def list_time_off_reasons_for_group(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -13638,10 +13459,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List timeOffReasons
+        Get timeOffReasons from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -13658,11 +13479,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffReasons"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffReasons"
         query_params = {
             k: v
             for k, v in [
@@ -13680,9 +13501,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def add_team_schedule_reason(
+    def create_time_off_reasons(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -13695,10 +13516,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create timeOffReason
+        Create new navigation property to timeOffReasons for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -13716,10 +13537,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -13735,7 +13556,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffReasons"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffReasons"
         query_params = {}
         response = self._post(
             url,
@@ -13745,19 +13566,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_time_off_reason(
+    def get_team_time_off_reasons(
         self,
-        team_id: str,
+        group_id: str,
         timeOffReason_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get timeOffReason
+        Get timeOffReasons from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeOffReason_id (string): timeOffReason-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -13769,22 +13590,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeOffReason_id is None:
             raise ValueError("Missing required parameter 'timeOffReason-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffReasons/{timeOffReason_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffReasons/{timeOffReason_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_time_off_reason_by_id(
+    def update_time_off_reason(
         self,
-        team_id: str,
+        group_id: str,
         timeOffReason_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -13798,10 +13619,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Replace timeOffReason
+        Update the navigation property timeOffReasons in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeOffReason_id (string): timeOffReason-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -13820,10 +13641,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeOffReason_id is None:
             raise ValueError("Missing required parameter 'timeOffReason-id'.")
         request_body_data = None
@@ -13841,18 +13662,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffReasons/{timeOffReason_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffReasons/{timeOffReason_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_time_off_reason_by_id(self, team_id: str, timeOffReason_id: str) -> Any:
+    def delete_time_off_reason(self, group_id: str, timeOffReason_id: str) -> Any:
         """
 
-        Delete timeOffReason
+        Delete navigation property timeOffReasons for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeOffReason_id (string): timeOffReason-id
 
         Returns:
@@ -13862,26 +13683,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeOffReason_id is None:
             raise ValueError("Missing required parameter 'timeOffReason-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffReasons/{timeOffReason_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffReasons/{timeOffReason_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_schedule_reasons_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_team_time_off_reasons_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -13892,20 +13713,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffReasons/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffReasons/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_time_off_requests(
+    def list_group_time_off_requests(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -13917,10 +13738,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List timeOffRequest
+        Get timeOffRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -13937,13 +13758,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffRequests"
-        )
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffRequests"
         query_params = {
             k: v
             for k, v in [
@@ -13961,9 +13780,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_time_off_request(
+    def create_group_team_schedule_time_off(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
@@ -13983,10 +13802,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create new navigation property to timeOffRequests for teams
+        Create new navigation property to timeOffRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
             createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
@@ -14011,10 +13830,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -14037,9 +13856,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffRequests"
-        )
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffRequests"
         query_params = {}
         response = self._post(
             url,
@@ -14049,19 +13866,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_team_time_off_request_details(
+    def get_time_off_request_by_id(
         self,
-        team_id: str,
+        group_id: str,
         timeOffRequest_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get timeOffRequest
+        Get timeOffRequests from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeOffRequest_id (string): timeOffRequest-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -14073,22 +13890,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeOffRequest_id is None:
             raise ValueError("Missing required parameter 'timeOffRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffRequests/{timeOffRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffRequests/{timeOffRequest_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_time_off_request_by_id(
+    def update_time_off_request(
         self,
-        team_id: str,
+        group_id: str,
         timeOffRequest_id: str,
         id: Optional[str] = None,
         createdBy: Optional[dict[str, dict[str, Any]]] = None,
@@ -14109,10 +13926,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property timeOffRequests in teams
+        Update the navigation property timeOffRequests in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeOffRequest_id (string): timeOffRequest-id
             id (string): The unique identifier for an entity. Read-only.
             createdBy (object): createdBy
@@ -14138,10 +13955,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeOffRequest_id is None:
             raise ValueError("Missing required parameter 'timeOffRequest-id'.")
         request_body_data = None
@@ -14166,18 +13983,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffRequests/{timeOffRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffRequests/{timeOffRequest_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_team_time_off_request(self, team_id: str, timeOffRequest_id: str) -> Any:
+    def delete_time_off_request_by_id(
+        self, group_id: str, timeOffRequest_id: str
+    ) -> Any:
         """
 
-        Delete timeOffRequest
+        Delete navigation property timeOffRequests for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             timeOffRequest_id (string): timeOffRequest-id
 
         Returns:
@@ -14187,26 +14006,26 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if timeOffRequest_id is None:
             raise ValueError("Missing required parameter 'timeOffRequest-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffRequests/{timeOffRequest_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffRequests/{timeOffRequest_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_time_off_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_team_time_off_requests_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -14217,20 +14036,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timeOffRequests/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timeOffRequests/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_schedule_times_off(
+    def get_team_times_off(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -14242,10 +14061,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List timesOff
+        Get timesOff from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -14262,256 +14081,258 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.schedule
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timesOff"
-        query_params = {
-            k: v
-            for k, v in [
-                ("$top", top),
-                ("$skip", skip),
-                ("$search", search),
-                ("$filter", filter),
-                ("$count", count),
-                ("$orderby", orderby),
-                ("$select", select),
-                ("$expand", expand),
-            ]
-            if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def create_time_off(
-        self,
-        team_id: str,
-        id: Optional[str] = None,
-        createdBy: Optional[dict[str, dict[str, Any]]] = None,
-        createdDateTime: Optional[str] = None,
-        lastModifiedBy: Optional[dict[str, dict[str, Any]]] = None,
-        lastModifiedDateTime: Optional[str] = None,
-        draftTimeOff: Optional[Any] = None,
-        isStagedForDeletion: Optional[bool] = None,
-        sharedTimeOff: Optional[Any] = None,
-        userId: Optional[str] = None,
-    ) -> Any:
-        """
-
-        Create timeOff
-
-        Args:
-            team_id (string): team-id
-            id (string): The unique identifier for an entity. Read-only.
-            createdBy (object): createdBy
-            createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
-            lastModifiedBy (object): lastModifiedBy
-            lastModifiedDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
-            draftTimeOff (string): draftTimeOff
-            isStagedForDeletion (boolean): The timeOff is marked for deletion, a process that is finalized when the schedule is shared.
-            sharedTimeOff (string): sharedTimeOff
-            userId (string): ID of the user assigned to the timeOff. Required.
-
-        Returns:
-            Any: Created navigation property.
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.schedule
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        request_body_data = None
-        request_body_data = {
-            "id": id,
-            "createdBy": createdBy,
-            "createdDateTime": createdDateTime,
-            "lastModifiedBy": lastModifiedBy,
-            "lastModifiedDateTime": lastModifiedDateTime,
-            "draftTimeOff": draftTimeOff,
-            "isStagedForDeletion": isStagedForDeletion,
-            "sharedTimeOff": sharedTimeOff,
-            "userId": userId,
-        }
-        request_body_data = {
-            k: v for k, v in request_body_data.items() if v is not None
-        }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timesOff"
-        query_params = {}
-        response = self._post(
-            url,
-            data=request_body_data,
-            params=query_params,
-            content_type="application/json",
-        )
-        return self._handle_response(response)
-
-    def get_team_time_off_details(
-        self,
-        team_id: str,
-        timeOff_id: str,
-        select: Optional[List[str]] = None,
-        expand: Optional[List[str]] = None,
-    ) -> Any:
-        """
-
-        Get timeOff
-
-        Args:
-            team_id (string): team-id
-            timeOff_id (string): timeOff-id
-            select (array): Select properties to be returned
-            expand (array): Expand related entities
-
-        Returns:
-            Any: Retrieved navigation property
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.schedule
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        if timeOff_id is None:
-            raise ValueError("Missing required parameter 'timeOff-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timesOff/{timeOff_id}"
-        query_params = {
-            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def patch_time_off_entry(
-        self,
-        team_id: str,
-        timeOff_id: str,
-        id: Optional[str] = None,
-        createdBy: Optional[dict[str, dict[str, Any]]] = None,
-        createdDateTime: Optional[str] = None,
-        lastModifiedBy: Optional[dict[str, dict[str, Any]]] = None,
-        lastModifiedDateTime: Optional[str] = None,
-        draftTimeOff: Optional[Any] = None,
-        isStagedForDeletion: Optional[bool] = None,
-        sharedTimeOff: Optional[Any] = None,
-        userId: Optional[str] = None,
-    ) -> Any:
-        """
-
-        Replace timeOff
-
-        Args:
-            team_id (string): team-id
-            timeOff_id (string): timeOff-id
-            id (string): The unique identifier for an entity. Read-only.
-            createdBy (object): createdBy
-            createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
-            lastModifiedBy (object): lastModifiedBy
-            lastModifiedDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
-            draftTimeOff (string): draftTimeOff
-            isStagedForDeletion (boolean): The timeOff is marked for deletion, a process that is finalized when the schedule is shared.
-            sharedTimeOff (string): sharedTimeOff
-            userId (string): ID of the user assigned to the timeOff. Required.
-
-        Returns:
-            Any: Success
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.schedule
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        if timeOff_id is None:
-            raise ValueError("Missing required parameter 'timeOff-id'.")
-        request_body_data = None
-        request_body_data = {
-            "id": id,
-            "createdBy": createdBy,
-            "createdDateTime": createdDateTime,
-            "lastModifiedBy": lastModifiedBy,
-            "lastModifiedDateTime": lastModifiedDateTime,
-            "draftTimeOff": draftTimeOff,
-            "isStagedForDeletion": isStagedForDeletion,
-            "sharedTimeOff": sharedTimeOff,
-            "userId": userId,
-        }
-        request_body_data = {
-            k: v for k, v in request_body_data.items() if v is not None
-        }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timesOff/{timeOff_id}"
-        query_params = {}
-        response = self._patch(url, data=request_body_data, params=query_params)
-        return self._handle_response(response)
-
-    def delete_time_off_entry(self, team_id: str, timeOff_id: str) -> Any:
-        """
-
-        Delete timeOff
-
-        Args:
-            team_id (string): team-id
-            timeOff_id (string): timeOff-id
-
-        Returns:
-            Any: Success
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.schedule
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        if timeOff_id is None:
-            raise ValueError("Missing required parameter 'timeOff-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timesOff/{timeOff_id}"
-        query_params = {}
-        response = self._delete(url, params=query_params)
-        return self._handle_response(response)
-
-    def get_team_schedule_times_off_count(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
-    ) -> Any:
-        """
-
-        Get the number of the resource
-
-        Args:
-            team_id (string): team-id
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-
-        Returns:
-            Any: The count of the resource
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.schedule
-        """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         url = (
-            f"{self.main_app_client.base_url}/teams/{team_id}/schedule/timesOff/$count"
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timesOff"
         )
+        query_params = {
+            k: v
+            for k, v in [
+                ("$top", top),
+                ("$skip", skip),
+                ("$search", search),
+                ("$filter", filter),
+                ("$count", count),
+                ("$orderby", orderby),
+                ("$select", select),
+                ("$expand", expand),
+            ]
+            if v is not None
+        }
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
+
+    def create_times_off(
+        self,
+        group_id: str,
+        id: Optional[str] = None,
+        createdBy: Optional[dict[str, dict[str, Any]]] = None,
+        createdDateTime: Optional[str] = None,
+        lastModifiedBy: Optional[dict[str, dict[str, Any]]] = None,
+        lastModifiedDateTime: Optional[str] = None,
+        draftTimeOff: Optional[Any] = None,
+        isStagedForDeletion: Optional[bool] = None,
+        sharedTimeOff: Optional[Any] = None,
+        userId: Optional[str] = None,
+    ) -> Any:
+        """
+
+        Create new navigation property to timesOff for groups
+
+        Args:
+            group_id (string): group-id
+            id (string): The unique identifier for an entity. Read-only.
+            createdBy (object): createdBy
+            createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
+            lastModifiedBy (object): lastModifiedBy
+            lastModifiedDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
+            draftTimeOff (string): draftTimeOff
+            isStagedForDeletion (boolean): The timeOff is marked for deletion, a process that is finalized when the schedule is shared.
+            sharedTimeOff (string): sharedTimeOff
+            userId (string): ID of the user assigned to the timeOff. Required.
+
+        Returns:
+            Any: Created navigation property.
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        request_body_data = None
+        request_body_data = {
+            "id": id,
+            "createdBy": createdBy,
+            "createdDateTime": createdDateTime,
+            "lastModifiedBy": lastModifiedBy,
+            "lastModifiedDateTime": lastModifiedDateTime,
+            "draftTimeOff": draftTimeOff,
+            "isStagedForDeletion": isStagedForDeletion,
+            "sharedTimeOff": sharedTimeOff,
+            "userId": userId,
+        }
+        request_body_data = {
+            k: v for k, v in request_body_data.items() if v is not None
+        }
+        url = (
+            f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timesOff"
+        )
+        query_params = {}
+        response = self._post(
+            url,
+            data=request_body_data,
+            params=query_params,
+            content_type="application/json",
+        )
+        return self._handle_response(response)
+
+    def get_group_time_off_details(
+        self,
+        group_id: str,
+        timeOff_id: str,
+        select: Optional[List[str]] = None,
+        expand: Optional[List[str]] = None,
+    ) -> Any:
+        """
+
+        Get timesOff from groups
+
+        Args:
+            group_id (string): group-id
+            timeOff_id (string): timeOff-id
+            select (array): Select properties to be returned
+            expand (array): Expand related entities
+
+        Returns:
+            Any: Retrieved navigation property
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        if timeOff_id is None:
+            raise ValueError("Missing required parameter 'timeOff-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timesOff/{timeOff_id}"
+        query_params = {
+            k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
+        }
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
+
+    def update_time_off_by_id(
+        self,
+        group_id: str,
+        timeOff_id: str,
+        id: Optional[str] = None,
+        createdBy: Optional[dict[str, dict[str, Any]]] = None,
+        createdDateTime: Optional[str] = None,
+        lastModifiedBy: Optional[dict[str, dict[str, Any]]] = None,
+        lastModifiedDateTime: Optional[str] = None,
+        draftTimeOff: Optional[Any] = None,
+        isStagedForDeletion: Optional[bool] = None,
+        sharedTimeOff: Optional[Any] = None,
+        userId: Optional[str] = None,
+    ) -> Any:
+        """
+
+        Update the navigation property timesOff in groups
+
+        Args:
+            group_id (string): group-id
+            timeOff_id (string): timeOff-id
+            id (string): The unique identifier for an entity. Read-only.
+            createdBy (object): createdBy
+            createdDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
+            lastModifiedBy (object): lastModifiedBy
+            lastModifiedDateTime (string): The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 is 2014-01-01T00:00:00Z
+            draftTimeOff (string): draftTimeOff
+            isStagedForDeletion (boolean): The timeOff is marked for deletion, a process that is finalized when the schedule is shared.
+            sharedTimeOff (string): sharedTimeOff
+            userId (string): ID of the user assigned to the timeOff. Required.
+
+        Returns:
+            Any: Success
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        if timeOff_id is None:
+            raise ValueError("Missing required parameter 'timeOff-id'.")
+        request_body_data = None
+        request_body_data = {
+            "id": id,
+            "createdBy": createdBy,
+            "createdDateTime": createdDateTime,
+            "lastModifiedBy": lastModifiedBy,
+            "lastModifiedDateTime": lastModifiedDateTime,
+            "draftTimeOff": draftTimeOff,
+            "isStagedForDeletion": isStagedForDeletion,
+            "sharedTimeOff": sharedTimeOff,
+            "userId": userId,
+        }
+        request_body_data = {
+            k: v for k, v in request_body_data.items() if v is not None
+        }
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timesOff/{timeOff_id}"
+        query_params = {}
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
+
+    def delete_time_off_from_group(self, group_id: str, timeOff_id: str) -> Any:
+        """
+
+        Delete navigation property timesOff for groups
+
+        Args:
+            group_id (string): group-id
+            timeOff_id (string): timeOff-id
+
+        Returns:
+            Any: Success
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        if timeOff_id is None:
+            raise ValueError("Missing required parameter 'timeOff-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timesOff/{timeOff_id}"
+        query_params = {}
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
+
+    def get_group_times_off_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    ) -> Any:
+        """
+
+        Get the number of the resource
+
+        Args:
+            group_id (string): group-id
+            search (string): Search items by search phrases
+            filter (string): Filter items by property values
+
+        Returns:
+            Any: The count of the resource
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            groups.team
+        """
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/schedule/timesOff/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def list_teamwork_tags_by_team_id(
+    def get_group_tags(
         self,
-        team_id: str,
+        group_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
         search: Optional[str] = None,
@@ -14523,10 +14344,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List teamworkTags
+        Get tags from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
             search (string): Search items by search phrases
@@ -14543,11 +14364,11 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags"
         query_params = {
             k: v
             for k, v in [
@@ -14565,9 +14386,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_team_tag(
+    def add_group_team_tag(
         self,
-        team_id: str,
+        group_id: str,
         id: Optional[str] = None,
         description: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -14578,10 +14399,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create teamworkTag
+        Create new navigation property to tags for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             id (string): The unique identifier for an entity. Read-only.
             description (string): The description of the tag as it appears to the user in Microsoft Teams. A teamworkTag can't have more than 200 teamworkTagMembers.
             displayName (string): The name of the tag as it appears to the user in Microsoft Teams.
@@ -14597,10 +14418,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         request_body_data = None
         request_body_data = {
             "id": id,
@@ -14614,7 +14435,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags"
         query_params = {}
         response = self._post(
             url,
@@ -14624,19 +14445,19 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_teamwork_tag(
+    def get_group_team_tag_list(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get teamworkTag
+        Get tags from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
@@ -14648,22 +14469,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_teamwork_tag(
+    def patch_group_team_tag_by_id(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         id: Optional[str] = None,
         description: Optional[str] = None,
@@ -14675,10 +14496,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update teamworkTag
+        Update the navigation property tags in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             id (string): The unique identifier for an entity. Read-only.
             description (string): The description of the tag as it appears to the user in Microsoft Teams. A teamworkTag can't have more than 200 teamworkTagMembers.
@@ -14695,10 +14516,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
         request_body_data = None
@@ -14714,18 +14535,18 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_teamwork_tag(self, team_id: str, teamworkTag_id: str) -> Any:
+    def delete_group_team_tags(self, group_id: str, teamworkTag_id: str) -> Any:
         """
 
-        Delete teamworkTag
+        Delete navigation property tags for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
 
         Returns:
@@ -14735,20 +14556,20 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def list_teamwork_tag_members(
+    def get_team_members_by_group(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -14761,10 +14582,10 @@ class TeamsApi(APISegmentBase):
     ) -> dict[str, Any]:
         """
 
-        List members in a teamworkTag
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             top (integer): Show only the first n items Example: '50'.
             skip (integer): Skip the first n items
@@ -14782,13 +14603,13 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}/members"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}/members"
         query_params = {
             k: v
             for k, v in [
@@ -14806,9 +14627,9 @@ class TeamsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_teamwork_tag_member(
+    def create_group_team_tag_member(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
@@ -14817,10 +14638,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Create teamworkTagMember
+        Create new navigation property to members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The member's display name.
@@ -14834,10 +14655,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
         request_body_data = None
@@ -14850,7 +14671,7 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}/members"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}/members"
         query_params = {}
         response = self._post(
             url,
@@ -14860,9 +14681,9 @@ class TeamsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_teamwork_tag_member(
+    def get_group_team_tag_members(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         teamworkTagMember_id: str,
         select: Optional[List[str]] = None,
@@ -14870,10 +14691,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get teamworkTagMember
+        Get members from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             teamworkTagMember_id (string): teamworkTagMember-id
             select (array): Select properties to be returned
@@ -14886,24 +14707,24 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
         if teamworkTagMember_id is None:
             raise ValueError("Missing required parameter 'teamworkTagMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}/members/{teamworkTagMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}/members/{teamworkTagMember_id}"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def update_team_tag_member(
+    def update_group_team_tag_member(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         teamworkTagMember_id: str,
         id: Optional[str] = None,
@@ -14913,10 +14734,10 @@ class TeamsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Update the navigation property members in teams
+        Update the navigation property members in groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             teamworkTagMember_id (string): teamworkTagMember-id
             id (string): The unique identifier for an entity. Read-only.
@@ -14931,10 +14752,10 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
         if teamworkTagMember_id is None:
@@ -14949,20 +14770,20 @@ class TeamsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}/members/{teamworkTagMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}/members/{teamworkTagMember_id}"
         query_params = {}
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def delete_teamwork_tag_member(
-        self, team_id: str, teamworkTag_id: str, teamworkTagMember_id: str
+    def delete_group_tag_member(
+        self, group_id: str, teamworkTag_id: str, teamworkTagMember_id: str
     ) -> Any:
         """
 
-        Delete teamworkTagMember
+        Delete navigation property members for groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             teamworkTagMember_id (string): teamworkTagMember-id
 
@@ -14973,22 +14794,22 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
         if teamworkTagMember_id is None:
             raise ValueError("Missing required parameter 'teamworkTagMember-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}/members/{teamworkTagMember_id}"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}/members/{teamworkTagMember_id}"
         query_params = {}
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_tag_members_count(
+    def get_team_tag_member_count(
         self,
-        team_id: str,
+        group_id: str,
         teamworkTag_id: str,
         search: Optional[str] = None,
         filter: Optional[str] = None,
@@ -14998,7 +14819,7 @@ class TeamsApi(APISegmentBase):
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             teamworkTag_id (string): teamworkTag-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
@@ -15010,28 +14831,28 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
         if teamworkTag_id is None:
             raise ValueError("Missing required parameter 'teamworkTag-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/{teamworkTag_id}/members/$count"
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/{teamworkTag_id}/members/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def count_team_tags(
-        self, team_id: str, search: Optional[str] = None, filter: Optional[str] = None
+    def get_group_tag_count(
+        self, group_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
 
         Get the number of the resource
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             search (string): Search items by search phrases
             filter (string): Filter items by property values
 
@@ -15042,29 +14863,29 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamworkTag
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/tags/$count"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/tags/$count"
         query_params = {
             k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_team_template(
+    def get_group_template(
         self,
-        team_id: str,
+        group_id: str,
         select: Optional[List[str]] = None,
         expand: Optional[List[str]] = None,
     ) -> Any:
         """
 
-        Get template from teams
+        Get template from groups
 
         Args:
-            team_id (string): team-id
+            group_id (string): group-id
             select (array): Select properties to be returned
             expand (array): Expand related entities
 
@@ -15075,419 +14896,333 @@ class TeamsApi(APISegmentBase):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.teamsTemplate
+            groups.team
         """
-        if team_id is None:
-            raise ValueError("Missing required parameter 'team-id'.")
-        url = f"{self.main_app_client.base_url}/teams/{team_id}/template"
+        if group_id is None:
+            raise ValueError("Missing required parameter 'group-id'.")
+        url = f"{self.main_app_client.base_url}/groups/{group_id}/team/template"
         query_params = {
             k: v for k, v in [("$select", select), ("$expand", expand)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def get_team_count(
-        self, search: Optional[str] = None, filter: Optional[str] = None
-    ) -> Any:
-        """
-
-        Get the number of the resource
-
-        Args:
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-
-        Returns:
-            Any: The count of the resource
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.team
-        """
-        url = f"{self.main_app_client.base_url}/teams/$count"
-        query_params = {
-            k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
-        }
-        response = self._get(url, params=query_params)
-        return self._handle_response(response)
-
-    def get_all_team_messages(
-        self,
-        model: Optional[str] = None,
-        top: Optional[int] = None,
-        skip: Optional[int] = None,
-        search: Optional[str] = None,
-        filter: Optional[str] = None,
-        count: Optional[bool] = None,
-        select: Optional[List[str]] = None,
-        orderby: Optional[List[str]] = None,
-        expand: Optional[List[str]] = None,
-    ) -> dict[str, Any]:
-        """
-
-        Invoke function getAllMessages
-
-        Args:
-            model (string): The payment model for the API
-            top (integer): Show only the first n items Example: '50'.
-            skip (integer): Skip the first n items
-            search (string): Search items by search phrases
-            filter (string): Filter items by property values
-            count (boolean): Include count of items
-            select (array): Select properties to be returned
-            orderby (array): Order items by property values
-            expand (array): Expand related entities
-
-        Returns:
-            dict[str, Any]: Success
-
-        Raises:
-            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
-
-        Tags:
-            teams.team.Functions
-        """
-        url = f"{self.main_app_client.base_url}/teams/microsoft.graph.getAllMessages()"
-        query_params = {
-            k: v
-            for k, v in [
-                ("model", model),
-                ("$top", top),
-                ("$skip", skip),
-                ("$search", search),
-                ("$filter", filter),
-                ("$count", count),
-                ("$select", select),
-                ("$orderby", orderby),
-                ("$expand", expand),
-            ]
-            if v is not None
         }
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
     def list_tools(self):
         return [
-            self.list_teams,
-            self.create_team,
-            self.get_team_info,
-            self.update_team,
-            self.delete_team_entity,
-            self.list_all_team_channels,
-            self.get_team_channels,
-            self.get_team_all_channels_count,
-            self.list_channels_for_team,
-            self.create_team_channel,
-            self.get_team_channel_info,
-            self.update_channel,
-            self.delete_channel,
-            self.list_all_team_channel_members,
-            self.create_team_channel_members,
-            self.get_team_channel_members_details,
-            self.update_conversation_member_in_team,
-            self.delete_team_channel_member,
-            self.count_team_channel_members,
-            self.add_channel_members,
-            self.remove_team_channel_all_members,
-            self.get_team_channel_files_folder,
-            self.get_files_folder_content,
-            self.update_team_channel_file_content,
-            self.delete_team_channel_file_content,
-            self.list_channel_members_by_team_and_cha,
-            self.add_member_to_channel_teamwise,
-            self.get_channel_member,
-            self.update_channel_member_by_id,
-            self.delete_conversation_member,
-            self.get_member_count,
-            self.add_team_channel_member_action,
-            self.remove_member_action,
-            self.list_channel_messages_by_id,
-            self.send_chat_message,
-            self.get_chat_message,
-            self.update_chat_message_by_team_channel,
-            self.delete_team_channel_message,
-            self.list_channel_msg_hosted_content,
-            self.create_message_hosted_content,
-            self.get_chat_message_hosted_content_by_i,
-            self.update_hosted_content_details,
-            self.del_ch_msg_hosted_content,
-            self.get_channel_msg_hosted_content_val,
-            self.update_team_hosted_content_val,
-            self.delete_channel_message_hosted_cont,
-            self.count_message_hosted_contents_by_me,
-            self.set_reaction_on_channel_message,
-            self.soft_delete_chat_message,
-            self.restore_team_channel_message,
-            self.unset_reaction_from_message,
-            self.get_replies,
-            self.create_channel_message_reply,
-            self.get_chat_message_reply,
-            self.update_message_reply,
-            self.delete_team_channel_message_reply_b,
-            self.list_reply_hosted_contents_by_messa,
-            self.create_hosted_content_link,
-            self.get_channel_reply_hosted_content,
-            self.patch_ch_reply_hosted_content,
-            self.del_ch_msg_reply_hosted_content,
-            self.get_ch_msg_reply_hosted_content_val,
-            self.update_msg_reply_hosted_content,
-            self.delete_hosted_content_by_message_re,
-            self.count_ch_msg_reply_host_contents,
-            self.add_reaction_to_reply,
-            self.soft_delete_channel_message_reply_p,
-            self.undo_soft_delete_team_message_reply,
-            self.unset_message_reaction_reply,
-            self.count_replies,
-            self.get_delta_replies_for_message,
-            self.get_team_channel_message_count,
-            self.delta_team_channel_messages,
-            self.archive_channel_action,
-            self.complete_team_channel_migration,
-            self.check_channel_user_access,
-            self.teams_channels_provision_email_pos,
-            self.remove_channel_email_from_team,
-            self.unarchive_team_channel,
-            self.list_channel_shared_teams,
-            self.share_channel_with_team,
-            self.get_shared_teams_channels_info,
-            self.update_shared_with_team_info,
-            self.delete_shared_team_channel_link,
-            self.list_channel_allowed_members_by_tea,
-            self.get_channel_allowed_member_by_id,
-            self.get_shared_team_members_count,
-            self.get_shared_team_channel_info,
-            self.count_shared_with_teams_in_channel,
-            self.get_channel_tabs,
-            self.add_channel_tab,
-            self.get_team_tab_info,
-            self.update_tab_info,
-            self.delete_channel_tab_by_id,
-            self.get_teams_app_data,
-            self.count_team_channel_tabs,
-            self.count_team_channels,
-            self.get_team_channel_messages,
-            self.get_retained_messages_by_team_id,
-            self.get_team_group,
-            self.list_service_provisioning_errors,
-            self.get_team_provisioning_errors_count,
-            self.get_incoming_team_channels,
-            self.get_incoming_channel_by_team_id,
-            self.get_team_incoming_channels_count,
-            self.get_team_apps,
-            self.add_team_app,
-            self.get_installed_team_app,
-            self.update_teams_installed_app_navigat,
-            self.remove_team_installed_app,
-            self.upgrade_team_app,
-            self.get_teams_app_detail,
-            self.get_app_definition,
-            self.get_installed_app_count,
-            self.get_team_members_list,
-            self.add_member_to_team,
-            self.get_team_member_details,
-            self.update_team_member_conversation_me,
-            self.remove_team_member_by_id,
-            self.get_team_member_count,
-            self.add_team_members_by_graph_action,
-            self.remove_team_member_by_graph_action,
-            self.team_archive_action,
-            self.clone_team_action,
-            self.complete_team_migration_action,
-            self.teams_send_activity_notif,
-            self.unarchive_team_operation,
-            self.get_team_operations_by_id,
-            self.create_team_operation,
-            self.get_teams_async_operation_by_id,
-            self.update_team_operation,
-            self.delete_teams_async_operation_for_te,
-            self.get_team_operation_count,
-            self.list_team_permission_grants,
-            self.create_team_permission_grant,
-            self.get_permission_grant_by_team_resour,
-            self.update_team_permission_grants,
-            self.delete_team_permission_grant,
-            self.count_permission_grants,
-            self.get_team_profile_photo,
-            self.update_team_photo,
-            self.get_profile_photo,
-            self.update_team_photo_content,
-            self.delete_team_photo_content,
-            self.get_primary_team_channel,
-            self.update_team_primary_channel,
-            self.delete_team_primary_channel,
-            self.list_team_primary_channel_members,
-            self.add_team_primary_channel_members,
-            self.get_team_primary_channel_members,
-            self.update_primary_channel_members,
-            self.remove_conversation_member,
-            self.count_team_primary_channel_members,
-            self.add_primary_channel_all_members_act,
-            self.remove_team_members,
-            self.get_team_files_folder,
-            self.get_team_primary_channel_content,
-            self.upload_team_folder_content,
-            self.delete_team_files_folder_content,
-            self.get_team_primary_members,
-            self.add_team_channel_members,
-            self.get_team_primary_channel_member_by_i,
-            self.update_conversation_member_by_id,
-            self.delete_team_primary_channel_member,
-            self.get_team_primary_channel_member_cou,
-            self.add_team_primary_channel_member,
-            self.remove_team_primary_channel_member,
-            self.list_team_primary_channel_messages,
-            self.create_team_message,
-            self.get_team_primary_messages,
-            self.patch_team_message_by_id,
-            self.delete_message_by_id,
-            self.get_team_channel_msg_hosted,
-            self.upload_hosted_content,
-            self.read_hosted_content,
-            self.patch_pri_ch_hosted_content,
-            self.del_pri_ch_msg_hosted_content,
-            self.get_hosted_message_content_by_id,
-            self.put_pri_ch_hosted_content_val,
-            self.del_pri_ch_msg_host_content_val,
-            self.get_hosted_contents_count,
-            self.set_reaction_to_primary_channel_mes,
-            self.soft_delete_team_channel_message,
-            self.teams_undo_soft_delete_message,
-            self.unset_reaction_by_message_id,
-            self.list_replies_by_message_id,
-            self.create_reply_to_chat_message,
-            self.get_team_primary_channel_message_re,
-            self.update_reply,
-            self.delete_reply,
-            self.list_team_reply_hosted_contents_by_i,
-            self.create_team_reply_hosted_content,
-            self.get_pri_ch_reply_hosted_content,
-            self.patch_pri_ch_reply_hosted_content,
-            self.del_pri_ch_reply_hosted_content,
-            self.get_pri_ch_reply_host_content_val,
-            self.put_pri_ch_reply_hosted_content_val,
-            self.del_pri_ch_reply_host_cont_val,
-            self.count_hosted_content_replies,
-            self.set_reaction_to_reply,
-            self.soft_delete_reply_message,
-            self.undo_reply_soft_delete,
-            self.unset_reply_reaction,
-            self.get_primary_channel_replies_count,
-            self.get_delta_replies,
-            self.get_primary_channel_message_count,
-            self.list_primary_channel_messages,
-            self.archive_team_primary_channel,
-            self.complete_team_migration,
-            self.check_user_access_in_channel,
-            self.provision_team_email,
-            self.remove_primary_team_email,
-            self.unarchive_team_primary_channel,
-            self.list_primary_channel_shared_teams,
-            self.share_primary_channel_with_teams,
-            self.get_shared_channel_info_by_id,
-            self.update_shared_channel_team_info,
-            self.remove_shared_with_team,
-            self.get_shared_members,
-            self.get_team_channel_shared_member_by_id,
-            self.count_shared_team_members,
-            self.get_shared_channel_team_info_team,
-            self.get_primary_channel_shared_with_tea,
-            self.get_team_tabs,
-            self.create_team_tab,
-            self.get_team_primary_tabs,
-            self.update_team_tab,
-            self.delete_team_tab,
-            self.get_teams_app_by_tab_id,
-            self.get_team_primary_channel_tabs_count,
-            self.get_team_schedule,
-            self.update_team_schedule,
-            self.delete_team_schedule,
-            self.get_team_day_notes,
-            self.create_team_schedule_day_note,
-            self.get_team_schedule_day_note,
-            self.update_team_day_note,
-            self.delete_team_day_note,
-            self.get_team_schedule_day_notes_count,
-            self.share_team_schedule_action,
-            self.get_team_shift_requests,
-            self.offer_shift_requests,
-            self.get_team_schedule_offer_shifts,
-            self.patch_offer_shift_request,
-            self.delete_shift_offer_request,
-            self.count_shift_offer_requests,
-            self.get_team_open_shift_requests,
-            self.create_open_shift_change_requests,
-            self.get_open_shift_change_request_by_id,
-            self.patch_open_shift_change_request_by_i,
-            self.remove_open_shift_change_request,
-            self.count_open_shift_change_requests,
-            self.list_team_open_shifts,
-            self.create_open_shift_for_team_schedule,
-            self.get_open_shift_by_team_id,
-            self.update_open_shift_details,
-            self.delete_open_shift,
-            self.count_open_shifts,
-            self.get_scheduling_groups,
-            self.create_scheduling_group_for_team,
-            self.get_team_schedule_scheduling_group,
-            self.replace_scheduling_group_in_team_sc,
-            self.delete_scheduling_group_by_id,
-            self.count_scheduling_groups,
-            self.get_team_shifts,
-            self.create_team_schedule_shift,
-            self.get_team_shift,
-            self.replace_shift,
-            self.delete_shift_by_team_id,
-            self.get_team_shift_count,
-            self.list_swap_shift_change_requests,
-            self.swap_shifts_change_request,
-            self.swap_shift_request_read,
-            self.update_swap_shift_request,
-            self.delete_swap_shifts_change_request,
-            self.count_swap_shift_requests,
-            self.list_team_time_cards,
-            self.create_team_schedule_time_card,
-            self.get_team_time_cards,
-            self.update_team_schedule_time_card_by_id,
-            self.delete_time_card_by_id,
-            self.clock_out_time_card_for_team_by_id,
-            self.confirm_team_time_card,
-            self.end_time_card_break,
-            self.start_break_time_card,
-            self.get_team_time_cards_count,
-            self.clock_in_time_card,
-            self.list_team_time_off_reasons,
-            self.add_team_schedule_reason,
-            self.get_time_off_reason,
-            self.update_time_off_reason_by_id,
-            self.delete_time_off_reason_by_id,
-            self.get_team_schedule_reasons_count,
-            self.list_time_off_requests,
-            self.create_team_time_off_request,
-            self.get_team_time_off_request_details,
-            self.update_time_off_request_by_id,
-            self.delete_team_time_off_request,
-            self.get_team_time_off_count,
-            self.get_team_schedule_times_off,
-            self.create_time_off,
-            self.get_team_time_off_details,
-            self.patch_time_off_entry,
-            self.delete_time_off_entry,
-            self.get_team_schedule_times_off_count,
-            self.list_teamwork_tags_by_team_id,
-            self.create_team_tag,
-            self.get_teamwork_tag,
-            self.update_teamwork_tag,
-            self.delete_teamwork_tag,
-            self.list_teamwork_tag_members,
-            self.create_teamwork_tag_member,
-            self.get_teamwork_tag_member,
-            self.update_team_tag_member,
-            self.delete_teamwork_tag_member,
-            self.get_team_tag_members_count,
-            self.count_team_tags,
-            self.get_team_template,
-            self.get_team_count,
-            self.get_all_team_messages,
+            self.get_group_team,
+            self.create_team_from_group,
+            self.delete_group_team,
+            self.fetch_groups_team_all_channels,
+            self.get_group_team_all_channels,
+            self.get_group_team_channels_count,
+            self.get_group_team_channels,
+            self.create_group_channel,
+            self.get_group_channels,
+            self.update_group_channels,
+            self.delete_group_channel,
+            self.list_channel_members,
+            self.create_group_team_channel_all_membe,
+            self.get_channel_member_details,
+            self.update_group_team_channel_member,
+            self.delete_group_channel_member,
+            self.count_channel_members,
+            self.add_group_channel_all_members,
+            self.remove_channel_members,
+            self.get_files_folder,
+            self.get_files_content,
+            self.update_files_folder_content,
+            self.delete_file_content,
+            self.get_group_team_channel_members,
+            self.create_group_team_channel_member,
+            self.get_group_channel_members,
+            self.update_channel_member,
+            self.delete_member_from_channel,
+            self.get_channel_member_count,
+            self.add_team_channel_member,
+            self.remove_channel_member,
+            self.get_group_messages,
+            self.create_group_channel_message,
+            self.get_group_channel_messages,
+            self.update_message,
+            self.delete_message_in_channel,
+            self.list_group_team_channel_message_hos,
+            self.add_hosted_content,
+            self.get_team_channel_message_hosted_con,
+            self.patch_hosted_content,
+            self.delete_group_team_channel_message_h,
+            self.get_group_channel_message_hosted_co,
+            self.update_group_team_channel_msg_hoste,
+            self.delete_hosted_content,
+            self.get_hosted_content_count,
+            self.set_reaction_on_group_team_channel_m,
+            self.soft_delete_channel_message,
+            self.restore_group_channel_message,
+            self.unset_reaction_on_message,
+            self.get_chat_message_replies,
+            self.create_reply_in_message,
+            self.get_reply_messages,
+            self.update_reply_message,
+            self.delete_channel_message_reply_by_id,
+            self.get_group_team_channel_msg_replies_h,
+            self.add_reply_content,
+            self.get_hosted_content_by_reply_id,
+            self.update_hosted_content_reply,
+            self.delete_hosted_content_by_message_id,
+            self.get_group_team_channel_msg_hosted_co,
+            self.update_group_team_channel_reply_hos,
+            self.delete_group_team_channel_message_r,
+            self.count_hosted_contents_replies,
+            self.set_reaction_to_message_reply,
+            self.soft_delete_channel_message_reply,
+            self.undo_message_reply_soft_delete,
+            self.unset_reaction_on_reply,
+            self.get_reply_count,
+            self.get_microsoft_graph_delta_replies,
+            self.get_group_channel_message_count,
+            self.get_channel_messages_delta,
+            self.archive_team_channel,
+            self.complete_group_channel_migration,
+            self.check_user_access,
+            self.provision_email_to_channel,
+            self.remove_channel_email,
+            self.unarchive_channel,
+            self.get_channel_shared_teams,
+            self.add_team_to_channel,
+            self.get_shared_with_team_info,
+            self.update_team_channel_sharing,
+            self.delete_shared_team_channel,
+            self.get_shared_channel_members,
+            self.get_channel_allowed_member_by_ids,
+            self.count_allowed_members_by_channel_te,
+            self.get_shared_team_info,
+            self.get_shared_with_teams_count_in_chann,
+            self.get_group_team_tabs,
+            self.create_group_tab,
+            self.get_group_tabs,
+            self.update_group_tab,
+            self.delete_group_tab,
+            self.get_teams_app_tab,
+            self.get_channel_tabs_count,
+            self.get_group_channel_total,
+            self.get_group_team_channel_messages_all,
+            self.get_retained_messages,
+            self.get_group_team_data,
+            self.get_group_service_errors,
+            self.count_service_provisioning_errors,
+            self.get_group_incoming_channels,
+            self.get_incoming_channels_by_group,
+            self.get_incoming_channels_count,
+            self.list_group_team_apps,
+            self.add_group_installed_app,
+            self.get_group_installed_apps,
+            self.patch_installed_apps,
+            self.delete_installed_app_for_group_team,
+            self.upgrade_teams_app,
+            self.get_teams_app_details,
+            self.get_teams_app_definition,
+            self.count_group_team_apps,
+            self.get_group_members,
+            self.create_group_member,
+            self.get_group_team_members,
+            self.update_group_team_member,
+            self.delete_group_member,
+            self.get_group_team_member_count,
+            self.add_group_team_member_action,
+            self.remove_team_member_action,
+            self.archive_group_team,
+            self.clone_team_group,
+            self.complete_group_team_migration,
+            self.send_activity_notification_to_grou,
+            self.unarchive_group_team,
+            self.get_group_operations,
+            self.create_group_team_operation,
+            self.get_group_team_operations,
+            self.update_group_operations,
+            self.delete_group_operation,
+            self.get_group_team_count,
+            self.list_group_team_permission_grants,
+            self.create_permission_grant,
+            self.get_group_permission_grants,
+            self.update_permission_grant,
+            self.delete_group_permission_grant,
+            self.get_group_permission_grants_count,
+            self.get_group_team_picture,
+            self.patch_group_team_photo,
+            self.get_group_team_photo,
+            self.put_group_team_photo_content,
+            self.delete_group_team_photo,
+            self.get_group_primary,
+            self.patch_primary_channel,
+            self.delete_primary_channel,
+            self.fetch_team_primary_channel_members,
+            self.create_primary_channel_all_members,
+            self.get_group_primary_channel_member,
+            self.update_team_member,
+            self.delete_primary_channel_member,
+            self.get_primary_channel_member_count,
+            self.add_group_team_members,
+            self.remove_primary_channel_members,
+            self.get_group_primary_channel_folder,
+            self.get_primary_channel_files_content,
+            self.update_primary_channel_content,
+            self.delete_group_files_folder_content,
+            self.list_primary_channel_members,
+            self.create_primary_channel_member_for_g,
+            self.get_primary_channel_members,
+            self.update_primary_channel_member,
+            self.delete_member_from_primary_channel,
+            self.count_primary_channel_members,
+            self.add_primary_channel_member,
+            self.remove_group_team_member,
+            self.get_primary_channel_messages,
+            self.post_primary_channel_message,
+            self.get_primary_channel_message,
+            self.update_primary_channel_message,
+            self.delete_primary_channel_message,
+            self.get_hosted_content_by_message_id,
+            self.add_hosted_content_to_group_message,
+            self.get_group_team_primary_channel_mess,
+            self.patch_group_team_primary_channel_me,
+            self.delete_message_hosted_content,
+            self.get_group_team_primary_channel_msg_h,
+            self.update_group_team_primary_msg_hoste,
+            self.delete_group_team_primary_channel_m,
+            self.count_hosted_content,
+            self.set_reaction_to_chat_message,
+            self.soft_delete_group_channel_message,
+            self.undo_soft_delete_chat_message,
+            self.unset_reaction_for_primary_channel,
+            self.get_primary_channel_replies,
+            self.create_reply_to_message,
+            self.list_group_team_primary_channel_mes,
+            self.update_primary_channel_reply,
+            self.delete_reply_message,
+            self.get_reply_contents,
+            self.create_reply_hosted_content,
+            self.get_hosted_content_reply,
+            self.patch_group_team_msg_reply_hosted_co,
+            self.delete_group_team_primary_channel_r,
+            self.get_group_team_channel_msg_reply_hos,
+            self.update_group_team_primary_channel_m,
+            self.delete_group_team_primary_ch_reply_h,
+            self.get_group_team_primary_channel_repl,
+            self.set_reply_reaction,
+            self.soft_delete_group_message_reply,
+            self.undo_soft_delete_chat_message_reply,
+            self.unset_reaction_to_reply,
+            self.count_primary_channel_replies,
+            self.get_primary_channel_replies_delta,
+            self.count_primary_channel_messages,
+            self.get_primary_channel_messages_delta,
+            self.archive_primary_channel,
+            self.complete_group_migration,
+            self.check_user_access_to_group,
+            self.provision_primary_email,
+            self.remove_primary_channel_email,
+            self.unarchive_primary_channel,
+            self.get_shared_with_teams,
+            self.share_primary_channel_teams,
+            self.get_shared_channel_teams,
+            self.update_shared_team_channel_info,
+            self.remove_group_team_primary_channel_s,
+            self.list_allowed_members_in_shared_chan,
+            self.get_channel_team_allowed_member,
+            self.count_allowed_members,
+            self.get_shared_channel_team_info,
+            self.get_shared_teams_count,
+            self.list_group_team_primary_channel_tab,
+            self.create_primary_channel_tab,
+            self.get_primary_channel_tab,
+            self.update_primary_channel_tab,
+            self.delete_primary_channel_tab,
+            self.get_primary_channel_tabs_app,
+            self.count_primary_channel_tabs,
+            self.get_group_schedule,
+            self.update_group_schedule,
+            self.delete_group_schedule,
+            self.get_group_day_notes,
+            self.add_day_notes_to_group_team_schedule,
+            self.get_group_team_day_notes,
+            self.update_day_note,
+            self.delete_day_note_by_id,
+            self.get_group_day_note_count,
+            self.share_team_schedule,
+            self.list_group_shift_requests,
+            self.offer_shift_requests_to_group,
+            self.get_offer_shift_request_details,
+            self.update_offer_shift_request,
+            self.delete_group_team_schedule_offer_sh,
+            self.count_group_shift_requests,
+            self.list_group_team_open_shift_change_re,
+            self.create_open_shift_change_request,
+            self.get_open_shift_change_request,
+            self.patch_group_team_open_shift_change_r,
+            self.delete_open_shift_change_request,
+            self.count_open_shift_requests,
+            self.get_open_shifts,
+            self.open_shifts_in_group,
+            self.get_open_shift_details,
+            self.update_open_shift,
+            self.delete_open_shift_by_id,
+            self.get_open_shifts_count,
+            self.get_group_scheduling_groups,
+            self.create_scheduling_group,
+            self.get_scheduling_group_details,
+            self.patch_group_team_schedule_scheduli,
+            self.delete_group_team_scheduling_group,
+            self.count_scheduling_groups_for_team,
+            self.get_group_team_shifts,
+            self.schedule_group_shifts,
+            self.get_group_shifts,
+            self.update_shift_details,
+            self.delete_group_team_shift_by_id,
+            self.get_shifts_count,
+            self.get_swap_shift_change_requests,
+            self.swap_shift_requests,
+            self.get_swap_shifts_change_request_by_id,
+            self.update_swap_shifts_change_request,
+            self.delete_swap_shift_request,
+            self.get_group_swap_shifts_count,
+            self.get_group_time_cards,
+            self.create_time_card_for_group,
+            self.get_group_time_card_schedule,
+            self.update_time_card,
+            self.delete_time_card,
+            self.clock_out_time_card,
+            self.confirm_time_card,
+            self.end_break_time_card,
+            self.start_group_team_time_card_break,
+            self.get_team_schedule_count,
+            self.clock_in_team_schedule,
+            self.list_time_off_reasons_for_group,
+            self.create_time_off_reasons,
+            self.get_team_time_off_reasons,
+            self.update_time_off_reason,
+            self.delete_time_off_reason,
+            self.get_team_time_off_reasons_count,
+            self.list_group_time_off_requests,
+            self.create_group_team_schedule_time_off,
+            self.get_time_off_request_by_id,
+            self.update_time_off_request,
+            self.delete_time_off_request_by_id,
+            self.get_team_time_off_requests_count,
+            self.get_team_times_off,
+            self.create_times_off,
+            self.get_group_time_off_details,
+            self.update_time_off_by_id,
+            self.delete_time_off_from_group,
+            self.get_group_times_off_count,
+            self.get_group_tags,
+            self.add_group_team_tag,
+            self.get_group_team_tag_list,
+            self.patch_group_team_tag_by_id,
+            self.delete_group_team_tags,
+            self.get_team_members_by_group,
+            self.create_group_team_tag_member,
+            self.get_group_team_tag_members,
+            self.update_group_team_tag_member,
+            self.delete_group_tag_member,
+            self.get_team_tag_member_count,
+            self.get_group_tag_count,
+            self.get_group_template,
         ]

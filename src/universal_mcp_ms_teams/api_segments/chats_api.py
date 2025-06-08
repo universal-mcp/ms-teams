@@ -7,7 +7,7 @@ class ChatsApi(APISegmentBase):
     def __init__(self, main_app_client: Any):
         super().__init__(main_app_client)
 
-    def chats_chat_list_chat(
+    def list_chats(
         self,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -59,18 +59,17 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_chat_create_chat(
+    def create_chat_operation(
         self,
-        atodata_type: str,
         id: Optional[str] = None,
         chatType: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         isHiddenForAllMembers: Optional[bool] = None,
         lastUpdatedDateTime: Optional[str] = None,
-        onlineMeetingInfo: Optional[Any] = None,
+        onlineMeetingInfo: Optional[dict[str, dict[str, Any]]] = None,
         tenantId: Optional[str] = None,
         topic: Optional[str] = None,
-        viewpoint: Optional[Any] = None,
+        viewpoint: Optional[dict[str, dict[str, Any]]] = None,
         webUrl: Optional[str] = None,
         installedApps: Optional[List[Any]] = None,
         lastMessagePreview: Optional[Any] = None,
@@ -85,19 +84,18 @@ class ChatsApi(APISegmentBase):
         Create chat
 
         Args:
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             chatType (string): chatType
             createdDateTime (string): Date and time at which the chat was created. Read-only.
             isHiddenForAllMembers (boolean): Indicates whether the chat is hidden for all its members. Read-only.
             lastUpdatedDateTime (string): Date and time at which the chat was renamed or the list of members was last changed. Read-only.
-            onlineMeetingInfo (string): Represents details about an online meeting. If the chat isn't associated with an online meeting, the property is empty. Read-only.
+            onlineMeetingInfo (object): onlineMeetingInfo
             tenantId (string): The identifier of the tenant in which the chat was created. Read-only.
             topic (string): (Optional) Subject or topic for the chat. Only available for group chats.
-            viewpoint (string): Represents caller-specific information about the chat, such as the last message read date and time. This property is populated only when the request is made in a delegated context.
+            viewpoint (object): viewpoint
             webUrl (string): The URL for the chat in Microsoft Teams. The URL should be treated as an opaque blob, and not parsed. Read-only.
             installedApps (array): A collection of all the apps in the chat. Nullable.
-            lastMessagePreview (string): Preview of the last message sent in the chat. Null if no messages were sent in the chat. Currently, only the list chats operation supports this property.
+            lastMessagePreview (string): lastMessagePreview
             members (array): A collection of all the members in the chat. Nullable.
             messages (array): A collection of all the messages in the chat. Nullable.
             permissionGrants (array): A collection of permissions granted to apps for the chat.
@@ -116,7 +114,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "chatType": chatType,
             "createdDateTime": createdDateTime,
             "isHiddenForAllMembers": isHiddenForAllMembers,
@@ -147,7 +144,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_chat_get_chat(
+    def get_chat(
         self,
         chat_id: str,
         select: Optional[List[str]] = None,
@@ -180,19 +177,18 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_chat_update_chat(
+    def update_chat_details(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         chatType: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         isHiddenForAllMembers: Optional[bool] = None,
         lastUpdatedDateTime: Optional[str] = None,
-        onlineMeetingInfo: Optional[Any] = None,
+        onlineMeetingInfo: Optional[dict[str, dict[str, Any]]] = None,
         tenantId: Optional[str] = None,
         topic: Optional[str] = None,
-        viewpoint: Optional[Any] = None,
+        viewpoint: Optional[dict[str, dict[str, Any]]] = None,
         webUrl: Optional[str] = None,
         installedApps: Optional[List[Any]] = None,
         lastMessagePreview: Optional[Any] = None,
@@ -208,19 +204,18 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             chatType (string): chatType
             createdDateTime (string): Date and time at which the chat was created. Read-only.
             isHiddenForAllMembers (boolean): Indicates whether the chat is hidden for all its members. Read-only.
             lastUpdatedDateTime (string): Date and time at which the chat was renamed or the list of members was last changed. Read-only.
-            onlineMeetingInfo (string): Represents details about an online meeting. If the chat isn't associated with an online meeting, the property is empty. Read-only.
+            onlineMeetingInfo (object): onlineMeetingInfo
             tenantId (string): The identifier of the tenant in which the chat was created. Read-only.
             topic (string): (Optional) Subject or topic for the chat. Only available for group chats.
-            viewpoint (string): Represents caller-specific information about the chat, such as the last message read date and time. This property is populated only when the request is made in a delegated context.
+            viewpoint (object): viewpoint
             webUrl (string): The URL for the chat in Microsoft Teams. The URL should be treated as an opaque blob, and not parsed. Read-only.
             installedApps (array): A collection of all the apps in the chat. Nullable.
-            lastMessagePreview (string): Preview of the last message sent in the chat. Null if no messages were sent in the chat. Currently, only the list chats operation supports this property.
+            lastMessagePreview (string): lastMessagePreview
             members (array): A collection of all the members in the chat. Nullable.
             messages (array): A collection of all the messages in the chat. Nullable.
             permissionGrants (array): A collection of permissions granted to apps for the chat.
@@ -241,7 +236,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "chatType": chatType,
             "createdDateTime": createdDateTime,
             "isHiddenForAllMembers": isHiddenForAllMembers,
@@ -267,7 +261,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_chat_delete_chat(self, chat_id: str) -> Any:
+    def delete_chat_by_id(self, chat_id: str) -> Any:
         """
 
         Delete chat
@@ -291,7 +285,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_list_installed_apps(
+    def list_chat_apps(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -347,12 +341,11 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_create_installed_apps(
+    def add_app_to_chat(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        consentedPermissionSet: Optional[Any] = None,
+        consentedPermissionSet: Optional[dict[str, dict[str, Any]]] = None,
         teamsApp: Optional[Any] = None,
         teamsAppDefinition: Optional[Any] = None,
     ) -> Any:
@@ -362,11 +355,10 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            consentedPermissionSet (string): The set of resource-specific permissions consented to while installing or upgrading the teamsApp.
-            teamsApp (string): The app that is installed.
-            teamsAppDefinition (string): The details of this version of the app.
+            consentedPermissionSet (object): consentedPermissionSet
+            teamsApp (string): teamsApp
+            teamsAppDefinition (string): teamsAppDefinition
 
         Returns:
             Any: Created navigation property.
@@ -382,7 +374,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "consentedPermissionSet": consentedPermissionSet,
             "teamsApp": teamsApp,
             "teamsAppDefinition": teamsAppDefinition,
@@ -400,7 +391,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_get_installed_apps(
+    def get_installed_app_in_chat_by_teams_ap(
         self,
         chat_id: str,
         teamsAppInstallation_id: str,
@@ -437,13 +428,12 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_installed_apps(
+    def update_chat_installed_apps(
         self,
         chat_id: str,
         teamsAppInstallation_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        consentedPermissionSet: Optional[Any] = None,
+        consentedPermissionSet: Optional[dict[str, dict[str, Any]]] = None,
         teamsApp: Optional[Any] = None,
         teamsAppDefinition: Optional[Any] = None,
     ) -> Any:
@@ -454,11 +444,10 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            consentedPermissionSet (string): The set of resource-specific permissions consented to while installing or upgrading the teamsApp.
-            teamsApp (string): The app that is installed.
-            teamsAppDefinition (string): The details of this version of the app.
+            consentedPermissionSet (object): consentedPermissionSet
+            teamsApp (string): teamsApp
+            teamsAppDefinition (string): teamsAppDefinition
 
         Returns:
             Any: Success
@@ -476,7 +465,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "consentedPermissionSet": consentedPermissionSet,
             "teamsApp": teamsApp,
             "teamsAppDefinition": teamsAppDefinition,
@@ -489,9 +477,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_installed_apps(
-        self, chat_id: str, teamsAppInstallation_id: str
-    ) -> Any:
+    def uninstall_app_in_chat(self, chat_id: str, teamsAppInstallation_id: str) -> Any:
         """
 
         Uninstall app in a chat
@@ -518,11 +504,11 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def upgrade_installed_app(
+    def upgrade_teams_app_installation(
         self,
         chat_id: str,
         teamsAppInstallation_id: str,
-        consentedPermissionSet: Optional[Any] = None,
+        consentedPermissionSet: Optional[dict[str, dict[str, Any]]] = None,
     ) -> Any:
         """
 
@@ -531,7 +517,7 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             teamsAppInstallation_id (string): teamsAppInstallation-id
-            consentedPermissionSet (string): consentedPermissionSet
+            consentedPermissionSet (object): consentedPermissionSet
 
         Returns:
             Any: Success
@@ -551,7 +537,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/installedApps/{teamsAppInstallation_id}/upgrade"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/installedApps/{teamsAppInstallation_id}/microsoft.graph.upgrade"
         query_params = {}
         response = self._post(
             url,
@@ -561,7 +547,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_teams_app(
+    def get_teams_app_from_chat(
         self,
         chat_id: str,
         teamsAppInstallation_id: str,
@@ -635,7 +621,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_chat_apps_count(
+    def get_chat_installed_app_total(
         self, chat_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
@@ -665,7 +651,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_get_last_message_preview(
+    def get_chat_last_preview(
         self,
         chat_id: str,
         select: Optional[List[str]] = None,
@@ -698,14 +684,13 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_last_message_preview(
+    def patch_chat_last_message_preview(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        body: Optional[Any] = None,
+        body: Optional[dict[str, dict[str, Any]]] = None,
         createdDateTime: Optional[str] = None,
-        eventDetail: Optional[Any] = None,
+        eventDetail: Optional[dict[str, dict[str, Any]]] = None,
         from_: Optional[Any] = None,
         isDeleted: Optional[bool] = None,
         messageType: Optional[str] = None,
@@ -716,12 +701,11 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            body (string): Body of the chatMessage. This will still contain markers for @mentions and attachments even though the object doesn't return @mentions and attachments.
+            body (object): body
             createdDateTime (string): Date time object representing the time at which message was created.
-            eventDetail (string): Read-only.  If present, represents details of an event that happened in a chat, a channel, or a team, for example, members were added, and so on. For event messages, the messageType property is set to systemEventMessage.
-            from_ (string): Information about the sender of the message.
+            eventDetail (object): eventDetail
+            from_ (string): from
             isDeleted (boolean): If set to true, the original message has been deleted.
             messageType (string): messageType
 
@@ -739,7 +723,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "body": body,
             "createdDateTime": createdDateTime,
             "eventDetail": eventDetail,
@@ -755,7 +738,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_last_message_preview(self, chat_id: str) -> Any:
+    def delete_chat_last_message_preview(self, chat_id: str) -> Any:
         """
 
         Delete navigation property lastMessagePreview for chats
@@ -779,7 +762,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_list_members(
+    def list_chat_members(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -835,10 +818,9 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_create_members(
+    def add_member_to_chat(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
         roles: Optional[List[str]] = None,
@@ -850,7 +832,6 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
             roles (array): The roles for that user. This property contains more qualifiers only when relevant - for example, if the member has owner privileges, the roles property contains owner as one of the values. Similarly, if the member is an in-tenant guest, the roles property contains guest as one of the values. A basic member shouldn't have any values specified in the roles property. An Out-of-tenant external member is assigned the owner role.
@@ -870,7 +851,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "displayName": displayName,
             "roles": roles,
             "visibleHistoryStartDateTime": visibleHistoryStartDateTime,
@@ -888,7 +868,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_get_members(
+    def get_conversation_member_by_chat_and(
         self,
         chat_id: str,
         conversationMember_id: str,
@@ -897,7 +877,7 @@ class ChatsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Get conversationMember in a chat
+        Get conversationMember
 
         Args:
             chat_id (string): chat-id
@@ -925,11 +905,10 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_members(
+    def update_chat_member(
         self,
         chat_id: str,
         conversationMember_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
         roles: Optional[List[str]] = None,
@@ -942,7 +921,6 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             conversationMember_id (string): conversationMember-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The display name of the user.
             roles (array): The roles for that user. This property contains more qualifiers only when relevant - for example, if the member has owner privileges, the roles property contains owner as one of the values. Similarly, if the member is an in-tenant guest, the roles property contains guest as one of the values. A basic member shouldn't have any values specified in the roles property. An Out-of-tenant external member is assigned the owner role.
@@ -964,7 +942,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "displayName": displayName,
             "roles": roles,
             "visibleHistoryStartDateTime": visibleHistoryStartDateTime,
@@ -977,7 +954,9 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_members(self, chat_id: str, conversationMember_id: str) -> Any:
+    def remove_conversation_member_from_ch(
+        self, chat_id: str, conversationMember_id: str
+    ) -> Any:
         """
 
         Remove member from chat
@@ -1004,7 +983,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_members_get_count(
+    def get_chat_member_number(
         self, chat_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
@@ -1034,7 +1013,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_chat_members_add(
+    def add_chat_member(
         self, chat_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
@@ -1061,7 +1040,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/members/add"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/members/microsoft.graph.add"
         query_params = {}
         response = self._post(
             url,
@@ -1071,7 +1050,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_chat_members_remove(
+    def remove_chat_member(
         self, chat_id: str, values: Optional[List[Any]] = None
     ) -> dict[str, Any]:
         """
@@ -1098,7 +1077,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/members/remove"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/members/microsoft.graph.remove"
         query_params = {}
         response = self._post(
             url,
@@ -1108,7 +1087,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_list_messages(
+    def list_chat_messages(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -1164,29 +1143,28 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_create_messages(
+    def post_chat_message(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        attachments: Optional[List[dict[str, Any]]] = None,
-        body: Optional[dict[str, Any]] = None,
-        channelIdentity: Optional[Any] = None,
+        attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
+        body: Optional[dict[str, dict[str, Any]]] = None,
+        channelIdentity: Optional[dict[str, dict[str, Any]]] = None,
         chatId: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         etag: Optional[str] = None,
-        eventDetail: Optional[Any] = None,
+        eventDetail: Optional[dict[str, dict[str, Any]]] = None,
         from_: Optional[Any] = None,
         importance: Optional[str] = None,
         lastEditedDateTime: Optional[str] = None,
         lastModifiedDateTime: Optional[str] = None,
         locale: Optional[str] = None,
-        mentions: Optional[List[dict[str, Any]]] = None,
-        messageHistory: Optional[List[dict[str, Any]]] = None,
+        mentions: Optional[List[dict[str, dict[str, Any]]]] = None,
+        messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None,
         messageType: Optional[str] = None,
-        policyViolation: Optional[Any] = None,
-        reactions: Optional[List[dict[str, Any]]] = None,
+        policyViolation: Optional[dict[str, dict[str, Any]]] = None,
+        reactions: Optional[List[dict[str, dict[str, Any]]]] = None,
         replyToId: Optional[str] = None,
         subject: Optional[str] = None,
         summary: Optional[str] = None,
@@ -1196,21 +1174,20 @@ class ChatsApi(APISegmentBase):
     ) -> Any:
         """
 
-        Send message in a chat
+        Send chatMessage in a channel or a chat
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
             body (object): body
-            channelIdentity (string): If the message was sent in a channel, represents identity of the channel.
+            channelIdentity (object): channelIdentity
             chatId (string): If the message was sent in a chat, represents the identity of the chat.
             createdDateTime (string): Timestamp of when the chat message was created.
             deletedDateTime (string): Read only. Timestamp at which the chat message was deleted, or null if not deleted.
             etag (string): Read-only. Version number of the chat message.
-            eventDetail (string): Read-only. If present, represents details of an event that happened in a chat, a channel, or a team, for example, adding new members. For event messages, the messageType property will be set to systemEventMessage.
-            from_ (string): Details of the sender of the chat message. Can only be set during migration.
+            eventDetail (object): eventDetail
+            from_ (string): from
             importance (string): importance
             lastEditedDateTime (string): Read only. Timestamp when edits to the chat message were made. Triggers an 'Edited' flag in the Teams UI. If no edits are made the value is null.
             lastModifiedDateTime (string): Read only. Timestamp when the chat message is created (initial setting) or modified, including when a reaction is added or removed.
@@ -1218,7 +1195,7 @@ class ChatsApi(APISegmentBase):
             mentions (array): List of entities mentioned in the chat message. Supported entities are: user, bot, team, channel, chat, and tag.
             messageHistory (array): List of activity history of a message item, including modification time and actions, such as reactionAdded, reactionRemoved, or reaction changes, on the message.
             messageType (string): messageType
-            policyViolation (string): Defines the properties of a policy violation set by a data loss prevention (DLP) application.
+            policyViolation (object): policyViolation
             reactions (array): Reactions for this chat message (for example, Like).
             replyToId (string): Read-only. ID of the parent chat message or root chat message of the thread. (Only applies to chat messages in channels, not chats.)
             subject (string): The subject of the chat message, in plaintext.
@@ -1241,7 +1218,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "attachments": attachments,
             "body": body,
             "channelIdentity": channelIdentity,
@@ -1280,7 +1256,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_get_messages(
+    def get_chat_message_detail(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -1319,30 +1295,29 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_messages(
+    def update_chat_messages(
         self,
         chat_id: str,
         chatMessage_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        attachments: Optional[List[dict[str, Any]]] = None,
-        body: Optional[dict[str, Any]] = None,
-        channelIdentity: Optional[Any] = None,
+        attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
+        body: Optional[dict[str, dict[str, Any]]] = None,
+        channelIdentity: Optional[dict[str, dict[str, Any]]] = None,
         chatId: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         etag: Optional[str] = None,
-        eventDetail: Optional[Any] = None,
+        eventDetail: Optional[dict[str, dict[str, Any]]] = None,
         from_: Optional[Any] = None,
         importance: Optional[str] = None,
         lastEditedDateTime: Optional[str] = None,
         lastModifiedDateTime: Optional[str] = None,
         locale: Optional[str] = None,
-        mentions: Optional[List[dict[str, Any]]] = None,
-        messageHistory: Optional[List[dict[str, Any]]] = None,
+        mentions: Optional[List[dict[str, dict[str, Any]]]] = None,
+        messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None,
         messageType: Optional[str] = None,
-        policyViolation: Optional[Any] = None,
-        reactions: Optional[List[dict[str, Any]]] = None,
+        policyViolation: Optional[dict[str, dict[str, Any]]] = None,
+        reactions: Optional[List[dict[str, dict[str, Any]]]] = None,
         replyToId: Optional[str] = None,
         subject: Optional[str] = None,
         summary: Optional[str] = None,
@@ -1357,17 +1332,16 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             chatMessage_id (string): chatMessage-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
             body (object): body
-            channelIdentity (string): If the message was sent in a channel, represents identity of the channel.
+            channelIdentity (object): channelIdentity
             chatId (string): If the message was sent in a chat, represents the identity of the chat.
             createdDateTime (string): Timestamp of when the chat message was created.
             deletedDateTime (string): Read only. Timestamp at which the chat message was deleted, or null if not deleted.
             etag (string): Read-only. Version number of the chat message.
-            eventDetail (string): Read-only. If present, represents details of an event that happened in a chat, a channel, or a team, for example, adding new members. For event messages, the messageType property will be set to systemEventMessage.
-            from_ (string): Details of the sender of the chat message. Can only be set during migration.
+            eventDetail (object): eventDetail
+            from_ (string): from
             importance (string): importance
             lastEditedDateTime (string): Read only. Timestamp when edits to the chat message were made. Triggers an 'Edited' flag in the Teams UI. If no edits are made the value is null.
             lastModifiedDateTime (string): Read only. Timestamp when the chat message is created (initial setting) or modified, including when a reaction is added or removed.
@@ -1375,7 +1349,7 @@ class ChatsApi(APISegmentBase):
             mentions (array): List of entities mentioned in the chat message. Supported entities are: user, bot, team, channel, chat, and tag.
             messageHistory (array): List of activity history of a message item, including modification time and actions, such as reactionAdded, reactionRemoved, or reaction changes, on the message.
             messageType (string): messageType
-            policyViolation (string): Defines the properties of a policy violation set by a data loss prevention (DLP) application.
+            policyViolation (object): policyViolation
             reactions (array): Reactions for this chat message (for example, Like).
             replyToId (string): Read-only. ID of the parent chat message or root chat message of the thread. (Only applies to chat messages in channels, not chats.)
             subject (string): The subject of the chat message, in plaintext.
@@ -1400,7 +1374,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "attachments": attachments,
             "body": body,
             "channelIdentity": channelIdentity,
@@ -1436,7 +1409,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_messages(self, chat_id: str, chatMessage_id: str) -> Any:
+    def delete_chat_messages(self, chat_id: str, chatMessage_id: str) -> Any:
         """
 
         Delete navigation property messages for chats
@@ -1465,7 +1438,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_hosted_content_by_message_id(
+    def list_hosted_contents(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -1525,11 +1498,10 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def create_hosted_content(
+    def create_chat_message_hosted_content(
         self,
         chat_id: str,
         chatMessage_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         contentBytes: Optional[str] = None,
         contentType: Optional[str] = None,
@@ -1541,7 +1513,6 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             chatMessage_id (string): chatMessage-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             contentBytes (string): Write only. Bytes for the hosted content (such as images).
             contentType (string): Write only. Content type. such as image/png, image/jpg.
@@ -1562,7 +1533,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "contentBytes": contentBytes,
             "contentType": contentType,
         }
@@ -1579,7 +1549,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_chat_msg_hosted_content(
+    def get_chat_message_content(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -1627,7 +1597,6 @@ class ChatsApi(APISegmentBase):
         chat_id: str,
         chatMessage_id: str,
         chatMessageHostedContent_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         contentBytes: Optional[str] = None,
         contentType: Optional[str] = None,
@@ -1640,7 +1609,6 @@ class ChatsApi(APISegmentBase):
             chat_id (string): chat-id
             chatMessage_id (string): chatMessage-id
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             contentBytes (string): Write only. Bytes for the hosted content (such as images).
             contentType (string): Write only. Content type. such as image/png, image/jpg.
@@ -1665,7 +1633,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "contentBytes": contentBytes,
             "contentType": contentType,
         }
@@ -1862,7 +1829,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def set_chat_message_reaction(
+    def set_chat_reaction(
         self, chat_id: str, chatMessage_id: str, reactionType: Optional[str] = None
     ) -> Any:
         """
@@ -1892,7 +1859,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/setReaction"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/microsoft.graph.setReaction"
         query_params = {}
         response = self._post(
             url,
@@ -1902,7 +1869,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def delete_message_softly(self, chat_id: str, chatMessage_id: str) -> Any:
+    def soft_delete_chat_message_by_id(self, chat_id: str, chatMessage_id: str) -> Any:
         """
 
         Invoke action softDelete
@@ -1925,7 +1892,7 @@ class ChatsApi(APISegmentBase):
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/softDelete"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/microsoft.graph.softDelete"
         query_params = {}
         response = self._post(
             url,
@@ -1935,7 +1902,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def restore_soft_deleted_message(self, chat_id: str, chatMessage_id: str) -> Any:
+    def undo_soft_delete_message(self, chat_id: str, chatMessage_id: str) -> Any:
         """
 
         Invoke action undoSoftDelete
@@ -1958,7 +1925,7 @@ class ChatsApi(APISegmentBase):
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/undoSoftDelete"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/microsoft.graph.undoSoftDelete"
         query_params = {}
         response = self._post(
             url,
@@ -1968,7 +1935,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unset_message_reaction(
+    def unset_reaction_on_chat_message(
         self, chat_id: str, chatMessage_id: str, reactionType: Optional[str] = None
     ) -> Any:
         """
@@ -1998,7 +1965,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/unsetReaction"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/microsoft.graph.unsetReaction"
         query_params = {}
         response = self._post(
             url,
@@ -2008,7 +1975,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_messages_list_replies(
+    def read_chat_replies(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -2068,30 +2035,29 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_messages_create_replies(
+    def create_chat_reply(
         self,
         chat_id: str,
         chatMessage_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        attachments: Optional[List[dict[str, Any]]] = None,
-        body: Optional[dict[str, Any]] = None,
-        channelIdentity: Optional[Any] = None,
+        attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
+        body: Optional[dict[str, dict[str, Any]]] = None,
+        channelIdentity: Optional[dict[str, dict[str, Any]]] = None,
         chatId: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         etag: Optional[str] = None,
-        eventDetail: Optional[Any] = None,
+        eventDetail: Optional[dict[str, dict[str, Any]]] = None,
         from_: Optional[Any] = None,
         importance: Optional[str] = None,
         lastEditedDateTime: Optional[str] = None,
         lastModifiedDateTime: Optional[str] = None,
         locale: Optional[str] = None,
-        mentions: Optional[List[dict[str, Any]]] = None,
-        messageHistory: Optional[List[dict[str, Any]]] = None,
+        mentions: Optional[List[dict[str, dict[str, Any]]]] = None,
+        messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None,
         messageType: Optional[str] = None,
-        policyViolation: Optional[Any] = None,
-        reactions: Optional[List[dict[str, Any]]] = None,
+        policyViolation: Optional[dict[str, dict[str, Any]]] = None,
+        reactions: Optional[List[dict[str, dict[str, Any]]]] = None,
         replyToId: Optional[str] = None,
         subject: Optional[str] = None,
         summary: Optional[str] = None,
@@ -2106,17 +2072,16 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             chatMessage_id (string): chatMessage-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
             body (object): body
-            channelIdentity (string): If the message was sent in a channel, represents identity of the channel.
+            channelIdentity (object): channelIdentity
             chatId (string): If the message was sent in a chat, represents the identity of the chat.
             createdDateTime (string): Timestamp of when the chat message was created.
             deletedDateTime (string): Read only. Timestamp at which the chat message was deleted, or null if not deleted.
             etag (string): Read-only. Version number of the chat message.
-            eventDetail (string): Read-only. If present, represents details of an event that happened in a chat, a channel, or a team, for example, adding new members. For event messages, the messageType property will be set to systemEventMessage.
-            from_ (string): Details of the sender of the chat message. Can only be set during migration.
+            eventDetail (object): eventDetail
+            from_ (string): from
             importance (string): importance
             lastEditedDateTime (string): Read only. Timestamp when edits to the chat message were made. Triggers an 'Edited' flag in the Teams UI. If no edits are made the value is null.
             lastModifiedDateTime (string): Read only. Timestamp when the chat message is created (initial setting) or modified, including when a reaction is added or removed.
@@ -2124,7 +2089,7 @@ class ChatsApi(APISegmentBase):
             mentions (array): List of entities mentioned in the chat message. Supported entities are: user, bot, team, channel, chat, and tag.
             messageHistory (array): List of activity history of a message item, including modification time and actions, such as reactionAdded, reactionRemoved, or reaction changes, on the message.
             messageType (string): messageType
-            policyViolation (string): Defines the properties of a policy violation set by a data loss prevention (DLP) application.
+            policyViolation (object): policyViolation
             reactions (array): Reactions for this chat message (for example, Like).
             replyToId (string): Read-only. ID of the parent chat message or root chat message of the thread. (Only applies to chat messages in channels, not chats.)
             subject (string): The subject of the chat message, in plaintext.
@@ -2149,7 +2114,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "attachments": attachments,
             "body": body,
             "channelIdentity": channelIdentity,
@@ -2188,7 +2152,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_messages_get_replies(
+    def get_chat_replies(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -2229,31 +2193,30 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_messages_update_replies(
+    def update_chat_replies(
         self,
         chat_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        attachments: Optional[List[dict[str, Any]]] = None,
-        body: Optional[dict[str, Any]] = None,
-        channelIdentity: Optional[Any] = None,
+        attachments: Optional[List[dict[str, dict[str, Any]]]] = None,
+        body: Optional[dict[str, dict[str, Any]]] = None,
+        channelIdentity: Optional[dict[str, dict[str, Any]]] = None,
         chatId: Optional[str] = None,
         createdDateTime: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         etag: Optional[str] = None,
-        eventDetail: Optional[Any] = None,
+        eventDetail: Optional[dict[str, dict[str, Any]]] = None,
         from_: Optional[Any] = None,
         importance: Optional[str] = None,
         lastEditedDateTime: Optional[str] = None,
         lastModifiedDateTime: Optional[str] = None,
         locale: Optional[str] = None,
-        mentions: Optional[List[dict[str, Any]]] = None,
-        messageHistory: Optional[List[dict[str, Any]]] = None,
+        mentions: Optional[List[dict[str, dict[str, Any]]]] = None,
+        messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None,
         messageType: Optional[str] = None,
-        policyViolation: Optional[Any] = None,
-        reactions: Optional[List[dict[str, Any]]] = None,
+        policyViolation: Optional[dict[str, dict[str, Any]]] = None,
+        reactions: Optional[List[dict[str, dict[str, Any]]]] = None,
         replyToId: Optional[str] = None,
         subject: Optional[str] = None,
         summary: Optional[str] = None,
@@ -2269,17 +2232,16 @@ class ChatsApi(APISegmentBase):
             chat_id (string): chat-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             attachments (array): References to attached objects like files, tabs, meetings etc.
             body (object): body
-            channelIdentity (string): If the message was sent in a channel, represents identity of the channel.
+            channelIdentity (object): channelIdentity
             chatId (string): If the message was sent in a chat, represents the identity of the chat.
             createdDateTime (string): Timestamp of when the chat message was created.
             deletedDateTime (string): Read only. Timestamp at which the chat message was deleted, or null if not deleted.
             etag (string): Read-only. Version number of the chat message.
-            eventDetail (string): Read-only. If present, represents details of an event that happened in a chat, a channel, or a team, for example, adding new members. For event messages, the messageType property will be set to systemEventMessage.
-            from_ (string): Details of the sender of the chat message. Can only be set during migration.
+            eventDetail (object): eventDetail
+            from_ (string): from
             importance (string): importance
             lastEditedDateTime (string): Read only. Timestamp when edits to the chat message were made. Triggers an 'Edited' flag in the Teams UI. If no edits are made the value is null.
             lastModifiedDateTime (string): Read only. Timestamp when the chat message is created (initial setting) or modified, including when a reaction is added or removed.
@@ -2287,7 +2249,7 @@ class ChatsApi(APISegmentBase):
             mentions (array): List of entities mentioned in the chat message. Supported entities are: user, bot, team, channel, chat, and tag.
             messageHistory (array): List of activity history of a message item, including modification time and actions, such as reactionAdded, reactionRemoved, or reaction changes, on the message.
             messageType (string): messageType
-            policyViolation (string): Defines the properties of a policy violation set by a data loss prevention (DLP) application.
+            policyViolation (object): policyViolation
             reactions (array): Reactions for this chat message (for example, Like).
             replyToId (string): Read-only. ID of the parent chat message or root chat message of the thread. (Only applies to chat messages in channels, not chats.)
             subject (string): The subject of the chat message, in plaintext.
@@ -2314,7 +2276,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "attachments": attachments,
             "body": body,
             "channelIdentity": channelIdentity,
@@ -2348,7 +2309,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_messages_delete_replies(
+    def delete_chat_reply(
         self, chat_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
@@ -2449,7 +2410,6 @@ class ChatsApi(APISegmentBase):
         chat_id: str,
         chatMessage_id: str,
         chatMessage_id1: str,
-        atodata_type: str,
         id: Optional[str] = None,
         contentBytes: Optional[str] = None,
         contentType: Optional[str] = None,
@@ -2462,7 +2422,6 @@ class ChatsApi(APISegmentBase):
             chat_id (string): chat-id
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             contentBytes (string): Write only. Bytes for the hosted content (such as images).
             contentType (string): Write only. Content type. such as image/png, image/jpg.
@@ -2485,7 +2444,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "contentBytes": contentBytes,
             "contentType": contentType,
         }
@@ -2555,7 +2513,6 @@ class ChatsApi(APISegmentBase):
         chatMessage_id: str,
         chatMessage_id1: str,
         chatMessageHostedContent_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         contentBytes: Optional[str] = None,
         contentType: Optional[str] = None,
@@ -2569,7 +2526,6 @@ class ChatsApi(APISegmentBase):
             chatMessage_id (string): chatMessage-id
             chatMessage_id1 (string): chatMessage-id1
             chatMessageHostedContent_id (string): chatMessageHostedContent-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             contentBytes (string): Write only. Bytes for the hosted content (such as images).
             contentType (string): Write only. Content type. such as image/png, image/jpg.
@@ -2596,7 +2552,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "contentBytes": contentBytes,
             "contentType": contentType,
         }
@@ -2822,7 +2777,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def set_chat_message_reply_reaction(
+    def set_chat_reply_reaction(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -2859,7 +2814,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/setReaction"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.setReaction"
         query_params = {}
         response = self._post(
             url,
@@ -2869,7 +2824,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def soft_delete_message_reply(
+    def soft_delete_chat_reply(
         self, chat_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
@@ -2897,7 +2852,7 @@ class ChatsApi(APISegmentBase):
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/softDelete"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.softDelete"
         query_params = {}
         response = self._post(
             url,
@@ -2907,7 +2862,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def undo_soft_delete_chat_message_reply(
+    def undo_soft_delete_reply(
         self, chat_id: str, chatMessage_id: str, chatMessage_id1: str
     ) -> Any:
         """
@@ -2935,7 +2890,7 @@ class ChatsApi(APISegmentBase):
         if chatMessage_id1 is None:
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         request_body_data = None
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/undoSoftDelete"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.undoSoftDelete"
         query_params = {}
         response = self._post(
             url,
@@ -2945,7 +2900,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def unset_chat_message_reaction(
+    def unset_chat_message_reply_reaction(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -2982,7 +2937,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/unsetReaction"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}/microsoft.graph.unsetReaction"
         query_params = {}
         response = self._post(
             url,
@@ -2992,7 +2947,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def get_chat_replies_count(
+    def get_chat_message_reply_count(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -3029,7 +2984,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def get_chat_replies_delta(
+    def chat_message_reply_delta_invoke(
         self,
         chat_id: str,
         chatMessage_id: str,
@@ -3071,7 +3026,7 @@ class ChatsApi(APISegmentBase):
             raise ValueError("Missing required parameter 'chat-id'.")
         if chatMessage_id is None:
             raise ValueError("Missing required parameter 'chatMessage-id'.")
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/delta()"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/microsoft.graph.delta()"
         query_params = {
             k: v
             for k, v in [
@@ -3089,7 +3044,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_messages_get_count_dde(
+    def get_chat_messages_count(
         self, chat_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
@@ -3119,7 +3074,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_chat_messages_delta(
+    def get_chat_message_delta(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -3157,7 +3112,7 @@ class ChatsApi(APISegmentBase):
         """
         if chat_id is None:
             raise ValueError("Missing required parameter 'chat-id'.")
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/delta()"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/messages/microsoft.graph.delta()"
         query_params = {
             k: v
             for k, v in [
@@ -3175,7 +3130,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_chat_hide_for_user(self, chat_id: str, user: Optional[Any] = None) -> Any:
+    def hide_for_user_action(self, chat_id: str, user: Optional[Any] = None) -> Any:
         """
 
         Invoke action hideForUser
@@ -3200,7 +3155,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/hideForUser"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/microsoft.graph.hideForUser"
         query_params = {}
         response = self._post(
             url,
@@ -3210,7 +3165,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_chat_mark_chat_read_for_user(
+    def mark_chat_read_for_user_action(
         self, chat_id: str, user: Optional[Any] = None
     ) -> Any:
         """
@@ -3237,7 +3192,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/markChatReadForUser"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/microsoft.graph.markChatReadForUser"
         query_params = {}
         response = self._post(
             url,
@@ -3247,7 +3202,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def mark_chat_unread_for_user(
+    def mark_chat_unread(
         self,
         chat_id: str,
         user: Optional[Any] = None,
@@ -3281,7 +3236,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/markChatUnreadForUser"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/microsoft.graph.markChatUnreadForUser"
         query_params = {}
         response = self._post(
             url,
@@ -3291,16 +3246,16 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def send_chat_notification(
+    def send_activity_notice(
         self,
         chat_id: str,
-        topic: Optional[Any] = None,
+        topic: Optional[dict[str, dict[str, Any]]] = None,
         activityType: Optional[str] = None,
         chainId: Optional[float] = None,
-        previewText: Optional[Any] = None,
+        previewText: Optional[dict[str, dict[str, Any]]] = None,
         teamsAppId: Optional[str] = None,
-        templateParameters: Optional[List[dict[str, Any]]] = None,
-        recipient: Optional[Any] = None,
+        templateParameters: Optional[List[dict[str, dict[str, Any]]]] = None,
+        recipient: Optional[dict[str, dict[str, Any]]] = None,
     ) -> Any:
         """
 
@@ -3308,13 +3263,13 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            topic (string): topic
+            topic (object): topic
             activityType (string): activityType
             chainId (number): chainId
-            previewText (string): previewText
+            previewText (object): previewText
             teamsAppId (string): teamsAppId
             templateParameters (array): templateParameters
-            recipient (string): recipient
+            recipient (object): recipient
 
         Returns:
             Any: Success
@@ -3340,9 +3295,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = (
-            f"{self.main_app_client.base_url}/chats/{chat_id}/sendActivityNotification"
-        )
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/microsoft.graph.sendActivityNotification"
         query_params = {}
         response = self._post(
             url,
@@ -3352,9 +3305,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_chat_unhide_for_user(
-        self, chat_id: str, user: Optional[Any] = None
-    ) -> Any:
+    def unhide_for_user_chat(self, chat_id: str, user: Optional[Any] = None) -> Any:
         """
 
         Invoke action unhideForUser
@@ -3379,7 +3330,7 @@ class ChatsApi(APISegmentBase):
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
-        url = f"{self.main_app_client.base_url}/chats/{chat_id}/unhideForUser"
+        url = f"{self.main_app_client.base_url}/chats/{chat_id}/microsoft.graph.unhideForUser"
         query_params = {}
         response = self._post(
             url,
@@ -3389,7 +3340,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_list_permission_grants(
+    def list_chat_permission_grants(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -3445,10 +3396,9 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_create_permission_grants(
+    def create_chat_permission_grant(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         clientAppId: Optional[str] = None,
@@ -3463,7 +3413,6 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             deletedDateTime (string): Date and time when this object was deleted. Always null when the object hasn't been deleted.
             clientAppId (string): ID of the service principal of the Microsoft Entra app that has been granted access. Read-only.
@@ -3486,7 +3435,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "deletedDateTime": deletedDateTime,
             "clientAppId": clientAppId,
             "clientId": clientId,
@@ -3507,7 +3455,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_get_permission_grants(
+    def get_chat_permission_grants(
         self,
         chat_id: str,
         resourceSpecificPermissionGrant_id: str,
@@ -3546,11 +3494,10 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_permission_grants(
+    def update_permission_grants_in_chat(
         self,
         chat_id: str,
         resourceSpecificPermissionGrant_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         deletedDateTime: Optional[str] = None,
         clientAppId: Optional[str] = None,
@@ -3566,7 +3513,6 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             resourceSpecificPermissionGrant_id (string): resourceSpecificPermissionGrant-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             deletedDateTime (string): Date and time when this object was deleted. Always null when the object hasn't been deleted.
             clientAppId (string): ID of the service principal of the Microsoft Entra app that has been granted access. Read-only.
@@ -3593,7 +3539,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "deletedDateTime": deletedDateTime,
             "clientAppId": clientAppId,
             "clientId": clientId,
@@ -3609,7 +3554,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_permission_grants(
+    def delete_chat_permission_grants(
         self, chat_id: str, resourceSpecificPermissionGrant_id: str
     ) -> Any:
         """
@@ -3640,7 +3585,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_chat_permission_count(
+    def get_chat_permission_grant_count(
         self, chat_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
@@ -3670,7 +3615,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_list_pinned_messages(
+    def get_pinned_chat_messages(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -3726,12 +3671,8 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_create_pinned_messages(
-        self,
-        chat_id: str,
-        atodata_type: str,
-        id: Optional[str] = None,
-        message: Optional[Any] = None,
+    def pin_chat_message(
+        self, chat_id: str, id: Optional[str] = None, message: Optional[Any] = None
     ) -> Any:
         """
 
@@ -3739,9 +3680,8 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            message (string): Represents details about the chat message that is pinned.
+            message (string): message
 
         Returns:
             Any: Created navigation property.
@@ -3755,7 +3695,7 @@ class ChatsApi(APISegmentBase):
         if chat_id is None:
             raise ValueError("Missing required parameter 'chat-id'.")
         request_body_data = None
-        request_body_data = {"id": id, "@odata.type": atodata_type, "message": message}
+        request_body_data = {"id": id, "message": message}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
@@ -3769,7 +3709,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_get_pinned_messages(
+    def get_chat_pinned_message_by_id(
         self,
         chat_id: str,
         pinnedChatMessageInfo_id: str,
@@ -3806,11 +3746,10 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_pinned_messages(
+    def update_pinned_messages_in_chat(
         self,
         chat_id: str,
         pinnedChatMessageInfo_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         message: Optional[Any] = None,
     ) -> Any:
@@ -3821,9 +3760,8 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             pinnedChatMessageInfo_id (string): pinnedChatMessageInfo-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            message (string): Represents details about the chat message that is pinned.
+            message (string): message
 
         Returns:
             Any: Success
@@ -3839,7 +3777,7 @@ class ChatsApi(APISegmentBase):
         if pinnedChatMessageInfo_id is None:
             raise ValueError("Missing required parameter 'pinnedChatMessageInfo-id'.")
         request_body_data = None
-        request_body_data = {"id": id, "@odata.type": atodata_type, "message": message}
+        request_body_data = {"id": id, "message": message}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
@@ -3848,7 +3786,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_pinned_messages(
+    def unpin_message_from_chat(
         self, chat_id: str, pinnedChatMessageInfo_id: str
     ) -> Any:
         """
@@ -3877,7 +3815,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def get_pinned_chat_message_detail(
+    def get_pinned_chat_message(
         self,
         chat_id: str,
         pinnedChatMessageInfo_id: str,
@@ -3944,7 +3882,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_list_tabs(
+    def list_chat_tabs(
         self,
         chat_id: str,
         top: Optional[int] = None,
@@ -4000,12 +3938,11 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_create_tabs(
+    def add_chat_tab(
         self,
         chat_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        configuration: Optional[Any] = None,
+        configuration: Optional[dict[str, dict[str, Any]]] = None,
         displayName: Optional[str] = None,
         webUrl: Optional[str] = None,
         teamsApp: Optional[Any] = None,
@@ -4016,12 +3953,11 @@ class ChatsApi(APISegmentBase):
 
         Args:
             chat_id (string): chat-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            configuration (string): Container for custom settings applied to a tab. The tab is considered configured only once this property is set.
+            configuration (object): configuration
             displayName (string): Name of the tab.
             webUrl (string): Deep link URL of the tab instance. Read only.
-            teamsApp (string): The application that is linked to the tab. This can't be changed after tab creation.
+            teamsApp (string): teamsApp
 
         Returns:
             Any: Created navigation property.
@@ -4037,7 +3973,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "configuration": configuration,
             "displayName": displayName,
             "webUrl": webUrl,
@@ -4056,7 +3991,7 @@ class ChatsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def chats_get_tabs(
+    def get_chat_tab(
         self,
         chat_id: str,
         teamsTab_id: str,
@@ -4093,13 +4028,12 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_update_tabs(
+    def update_chat_tab(
         self,
         chat_id: str,
         teamsTab_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        configuration: Optional[Any] = None,
+        configuration: Optional[dict[str, dict[str, Any]]] = None,
         displayName: Optional[str] = None,
         webUrl: Optional[str] = None,
         teamsApp: Optional[Any] = None,
@@ -4111,12 +4045,11 @@ class ChatsApi(APISegmentBase):
         Args:
             chat_id (string): chat-id
             teamsTab_id (string): teamsTab-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            configuration (string): Container for custom settings applied to a tab. The tab is considered configured only once this property is set.
+            configuration (object): configuration
             displayName (string): Name of the tab.
             webUrl (string): Deep link URL of the tab instance. Read only.
-            teamsApp (string): The application that is linked to the tab. This can't be changed after tab creation.
+            teamsApp (string): teamsApp
 
         Returns:
             Any: Success
@@ -4134,7 +4067,6 @@ class ChatsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "configuration": configuration,
             "displayName": displayName,
             "webUrl": webUrl,
@@ -4148,7 +4080,7 @@ class ChatsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def chats_delete_tabs(self, chat_id: str, teamsTab_id: str) -> Any:
+    def delete_chat_tab(self, chat_id: str, teamsTab_id: str) -> Any:
         """
 
         Delete tab from chat
@@ -4175,7 +4107,7 @@ class ChatsApi(APISegmentBase):
         response = self._delete(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_tabs_get_teams_app(
+    def get_chat_teams_app(
         self,
         chat_id: str,
         teamsTab_id: str,
@@ -4212,7 +4144,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_tabs_get_count_b(
+    def get_chat_tab_count(
         self, chat_id: str, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
@@ -4242,7 +4174,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_get_count_c(
+    def get_chat_count(
         self, search: Optional[str] = None, filter: Optional[str] = None
     ) -> Any:
         """
@@ -4269,7 +4201,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_get_all_messages(
+    def get_all_chat_messages(
         self,
         model: Optional[str] = None,
         top: Optional[int] = None,
@@ -4305,7 +4237,7 @@ class ChatsApi(APISegmentBase):
         Tags:
             chats.chat.Functions
         """
-        url = f"{self.main_app_client.base_url}/chats/getAllMessages()"
+        url = f"{self.main_app_client.base_url}/chats/microsoft.graph.getAllMessages()"
         query_params = {
             k: v
             for k, v in [
@@ -4324,7 +4256,7 @@ class ChatsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def chats_get_all_retained_messages(
+    def get_retained_messages_list(
         self,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -4358,7 +4290,7 @@ class ChatsApi(APISegmentBase):
         Tags:
             chats.chat.Functions
         """
-        url = f"{self.main_app_client.base_url}/chats/getAllRetainedMessages()"
+        url = f"{self.main_app_client.base_url}/chats/microsoft.graph.getAllRetainedMessages()"
         query_params = {
             k: v
             for k, v in [
@@ -4378,54 +4310,54 @@ class ChatsApi(APISegmentBase):
 
     def list_tools(self):
         return [
-            self.chats_chat_list_chat,
-            self.chats_chat_create_chat,
-            self.chats_chat_get_chat,
-            self.chats_chat_update_chat,
-            self.chats_chat_delete_chat,
-            self.chats_list_installed_apps,
-            self.chats_create_installed_apps,
-            self.chats_get_installed_apps,
-            self.chats_update_installed_apps,
-            self.chats_delete_installed_apps,
-            self.upgrade_installed_app,
-            self.get_teams_app,
+            self.list_chats,
+            self.create_chat_operation,
+            self.get_chat,
+            self.update_chat_details,
+            self.delete_chat_by_id,
+            self.list_chat_apps,
+            self.add_app_to_chat,
+            self.get_installed_app_in_chat_by_teams_ap,
+            self.update_chat_installed_apps,
+            self.uninstall_app_in_chat,
+            self.upgrade_teams_app_installation,
+            self.get_teams_app_from_chat,
             self.get_installed_app_definition,
-            self.get_chat_apps_count,
-            self.chats_get_last_message_preview,
-            self.chats_update_last_message_preview,
-            self.chats_delete_last_message_preview,
-            self.chats_list_members,
-            self.chats_create_members,
-            self.chats_get_members,
-            self.chats_update_members,
-            self.chats_delete_members,
-            self.chats_members_get_count,
-            self.chats_chat_members_add,
-            self.chats_chat_members_remove,
-            self.chats_list_messages,
-            self.chats_create_messages,
-            self.chats_get_messages,
-            self.chats_update_messages,
-            self.chats_delete_messages,
-            self.get_hosted_content_by_message_id,
-            self.create_hosted_content,
-            self.get_chat_msg_hosted_content,
+            self.get_chat_installed_app_total,
+            self.get_chat_last_preview,
+            self.patch_chat_last_message_preview,
+            self.delete_chat_last_message_preview,
+            self.list_chat_members,
+            self.add_member_to_chat,
+            self.get_conversation_member_by_chat_and,
+            self.update_chat_member,
+            self.remove_conversation_member_from_ch,
+            self.get_chat_member_number,
+            self.add_chat_member,
+            self.remove_chat_member,
+            self.list_chat_messages,
+            self.post_chat_message,
+            self.get_chat_message_detail,
+            self.update_chat_messages,
+            self.delete_chat_messages,
+            self.list_hosted_contents,
+            self.create_chat_message_hosted_content,
+            self.get_chat_message_content,
             self.update_chat_message_content,
             self.del_chat_msg_hosted_content,
             self.get_chat_msg_hosted_content_val,
             self.update_chat_hosted_content_val,
             self.del_chat_msg_host_content_val,
             self.count_chat_msg_hosted_contents,
-            self.set_chat_message_reaction,
-            self.delete_message_softly,
-            self.restore_soft_deleted_message,
-            self.unset_message_reaction,
-            self.chats_messages_list_replies,
-            self.chats_messages_create_replies,
-            self.chats_messages_get_replies,
-            self.chats_messages_update_replies,
-            self.chats_messages_delete_replies,
+            self.set_chat_reaction,
+            self.soft_delete_chat_message_by_id,
+            self.undo_soft_delete_message,
+            self.unset_reaction_on_chat_message,
+            self.read_chat_replies,
+            self.create_chat_reply,
+            self.get_chat_replies,
+            self.update_chat_replies,
+            self.delete_chat_reply,
             self.get_hosted_contents,
             self.add_chat_message_hosted_content,
             self.get_chat_message_hosted_content,
@@ -4435,40 +4367,40 @@ class ChatsApi(APISegmentBase):
             self.update_chat_rply_hosted_content_val,
             self.del_chat_reply_host_content_val,
             self.count_chat_message_replies_content,
-            self.set_chat_message_reply_reaction,
-            self.soft_delete_message_reply,
-            self.undo_soft_delete_chat_message_reply,
-            self.unset_chat_message_reaction,
-            self.get_chat_replies_count,
-            self.get_chat_replies_delta,
-            self.chats_messages_get_count_dde,
-            self.chats_chat_messages_delta,
-            self.chats_chat_hide_for_user,
-            self.chats_chat_mark_chat_read_for_user,
-            self.mark_chat_unread_for_user,
-            self.send_chat_notification,
-            self.chats_chat_unhide_for_user,
-            self.chats_list_permission_grants,
-            self.chats_create_permission_grants,
-            self.chats_get_permission_grants,
-            self.chats_update_permission_grants,
-            self.chats_delete_permission_grants,
-            self.get_chat_permission_count,
-            self.chats_list_pinned_messages,
-            self.chats_create_pinned_messages,
-            self.chats_get_pinned_messages,
-            self.chats_update_pinned_messages,
-            self.chats_delete_pinned_messages,
-            self.get_pinned_chat_message_detail,
+            self.set_chat_reply_reaction,
+            self.soft_delete_chat_reply,
+            self.undo_soft_delete_reply,
+            self.unset_chat_message_reply_reaction,
+            self.get_chat_message_reply_count,
+            self.chat_message_reply_delta_invoke,
+            self.get_chat_messages_count,
+            self.get_chat_message_delta,
+            self.hide_for_user_action,
+            self.mark_chat_read_for_user_action,
+            self.mark_chat_unread,
+            self.send_activity_notice,
+            self.unhide_for_user_chat,
+            self.list_chat_permission_grants,
+            self.create_chat_permission_grant,
+            self.get_chat_permission_grants,
+            self.update_permission_grants_in_chat,
+            self.delete_chat_permission_grants,
+            self.get_chat_permission_grant_count,
+            self.get_pinned_chat_messages,
+            self.pin_chat_message,
+            self.get_chat_pinned_message_by_id,
+            self.update_pinned_messages_in_chat,
+            self.unpin_message_from_chat,
+            self.get_pinned_chat_message,
             self.get_chat_pinned_messages_count,
-            self.chats_list_tabs,
-            self.chats_create_tabs,
-            self.chats_get_tabs,
-            self.chats_update_tabs,
-            self.chats_delete_tabs,
-            self.chats_tabs_get_teams_app,
-            self.chats_tabs_get_count_b,
-            self.chats_get_count_c,
-            self.chats_get_all_messages,
-            self.chats_get_all_retained_messages,
+            self.list_chat_tabs,
+            self.add_chat_tab,
+            self.get_chat_tab,
+            self.update_chat_tab,
+            self.delete_chat_tab,
+            self.get_chat_teams_app,
+            self.get_chat_tab_count,
+            self.get_chat_count,
+            self.get_all_chat_messages,
+            self.get_retained_messages_list,
         ]

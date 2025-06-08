@@ -7,7 +7,7 @@ class AppcatalogsApi(APISegmentBase):
     def __init__(self, main_app_client: Any):
         super().__init__(main_app_client)
 
-    def app_catalogs_list_teams_apps(
+    def list_teams_apps(
         self,
         top: Optional[int] = None,
         skip: Optional[int] = None,
@@ -59,12 +59,11 @@ class AppcatalogsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def app_catalogs_create_teams_apps(
+    def publish_teams_app(
         self,
-        atodata_type: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
-        distributionMethod: Optional[Any] = None,
+        distributionMethod: Optional[str] = None,
         externalId: Optional[str] = None,
         appDefinitions: Optional[List[Any]] = None,
     ) -> Any:
@@ -73,10 +72,9 @@ class AppcatalogsApi(APISegmentBase):
         Publish teamsApp
 
         Args:
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The name of the catalog app provided by the app developer in the Microsoft Teams zip app package.
-            distributionMethod (string): The method of distribution for the app. Read-only.
+            distributionMethod (string): distributionMethod
             externalId (string): The ID of the catalog provided by the app developer in the Microsoft Teams zip app package.
             appDefinitions (array): The details for each version of the app.
 
@@ -92,7 +90,6 @@ class AppcatalogsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "displayName": displayName,
             "distributionMethod": distributionMethod,
             "externalId": externalId,
@@ -111,7 +108,7 @@ class AppcatalogsApi(APISegmentBase):
         )
         return self._handle_response(response)
 
-    def app_catalogs_get_teams_apps(
+    def get_teams_apps_from_catalogs(
         self,
         teamsApp_id: str,
         select: Optional[List[str]] = None,
@@ -144,13 +141,12 @@ class AppcatalogsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
-    def app_catalogs_update_teams_apps(
+    def update_app_catalog_teams_app_by_id(
         self,
         teamsApp_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
         displayName: Optional[str] = None,
-        distributionMethod: Optional[Any] = None,
+        distributionMethod: Optional[str] = None,
         externalId: Optional[str] = None,
         appDefinitions: Optional[List[Any]] = None,
     ) -> Any:
@@ -160,10 +156,9 @@ class AppcatalogsApi(APISegmentBase):
 
         Args:
             teamsApp_id (string): teamsApp-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
             displayName (string): The name of the catalog app provided by the app developer in the Microsoft Teams zip app package.
-            distributionMethod (string): The method of distribution for the app. Read-only.
+            distributionMethod (string): distributionMethod
             externalId (string): The ID of the catalog provided by the app developer in the Microsoft Teams zip app package.
             appDefinitions (array): The details for each version of the app.
 
@@ -181,7 +176,6 @@ class AppcatalogsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "displayName": displayName,
             "distributionMethod": distributionMethod,
             "externalId": externalId,
@@ -195,7 +189,7 @@ class AppcatalogsApi(APISegmentBase):
         response = self._patch(url, data=request_body_data, params=query_params)
         return self._handle_response(response)
 
-    def app_catalogs_delete_teams_apps(self, teamsApp_id: str) -> Any:
+    def delete_teams_app(self, teamsApp_id: str) -> Any:
         """
 
         Delete teamsApp
@@ -278,14 +272,13 @@ class AppcatalogsApi(APISegmentBase):
     def create_teams_app_definition(
         self,
         teamsApp_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        authorization: Optional[Any] = None,
-        createdBy: Optional[Any] = None,
+        authorization: Optional[dict[str, dict[str, Any]]] = None,
+        createdBy: Optional[dict[str, dict[str, Any]]] = None,
         description: Optional[str] = None,
         displayName: Optional[str] = None,
         lastModifiedDateTime: Optional[str] = None,
-        publishingState: Optional[Any] = None,
+        publishingState: Optional[str] = None,
         shortDescription: Optional[str] = None,
         teamsAppId: Optional[str] = None,
         version: Optional[str] = None,
@@ -297,18 +290,17 @@ class AppcatalogsApi(APISegmentBase):
 
         Args:
             teamsApp_id (string): teamsApp-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            authorization (string): Authorization requirements specified in the Teams app manifest.
-            createdBy (string): createdBy
+            authorization (object): authorization
+            createdBy (object): createdBy
             description (string): Verbose description of the application.
             displayName (string): The name of the app provided by the app developer.
             lastModifiedDateTime (string): lastModifiedDateTime
-            publishingState (string): The published status of a specific version of a Teams app. Possible values are:submitted—The specific version of the Teams app was submitted and is under review.published—The request to publish the specific version of the Teams app was approved by the admin and the app is published.rejected—The admin rejected the request to publish the specific version of the Teams app.
+            publishingState (string): publishingState
             shortDescription (string): Short description of the application.
             teamsAppId (string): The ID from the Teams app manifest.
             version (string): The version number of the application.
-            bot (string): The details of the bot specified in the Teams app manifest.
+            bot (string): bot
 
         Returns:
             Any: Created navigation property.
@@ -324,7 +316,6 @@ class AppcatalogsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "authorization": authorization,
             "createdBy": createdBy,
             "description": description,
@@ -390,14 +381,13 @@ class AppcatalogsApi(APISegmentBase):
         self,
         teamsApp_id: str,
         teamsAppDefinition_id: str,
-        atodata_type: str,
         id: Optional[str] = None,
-        authorization: Optional[Any] = None,
-        createdBy: Optional[Any] = None,
+        authorization: Optional[dict[str, dict[str, Any]]] = None,
+        createdBy: Optional[dict[str, dict[str, Any]]] = None,
         description: Optional[str] = None,
         displayName: Optional[str] = None,
         lastModifiedDateTime: Optional[str] = None,
-        publishingState: Optional[Any] = None,
+        publishingState: Optional[str] = None,
         shortDescription: Optional[str] = None,
         teamsAppId: Optional[str] = None,
         version: Optional[str] = None,
@@ -410,18 +400,17 @@ class AppcatalogsApi(APISegmentBase):
         Args:
             teamsApp_id (string): teamsApp-id
             teamsAppDefinition_id (string): teamsAppDefinition-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
-            authorization (string): Authorization requirements specified in the Teams app manifest.
-            createdBy (string): createdBy
+            authorization (object): authorization
+            createdBy (object): createdBy
             description (string): Verbose description of the application.
             displayName (string): The name of the app provided by the app developer.
             lastModifiedDateTime (string): lastModifiedDateTime
-            publishingState (string): The published status of a specific version of a Teams app. Possible values are:submitted—The specific version of the Teams app was submitted and is under review.published—The request to publish the specific version of the Teams app was approved by the admin and the app is published.rejected—The admin rejected the request to publish the specific version of the Teams app.
+            publishingState (string): publishingState
             shortDescription (string): Short description of the application.
             teamsAppId (string): The ID from the Teams app manifest.
             version (string): The version number of the application.
-            bot (string): The details of the bot specified in the Teams app manifest.
+            bot (string): bot
 
         Returns:
             Any: Success
@@ -439,7 +428,6 @@ class AppcatalogsApi(APISegmentBase):
         request_body_data = None
         request_body_data = {
             "id": id,
-            "@odata.type": atodata_type,
             "authorization": authorization,
             "createdBy": createdBy,
             "description": description,
@@ -526,11 +514,7 @@ class AppcatalogsApi(APISegmentBase):
         return self._handle_response(response)
 
     def update_bot_definition(
-        self,
-        teamsApp_id: str,
-        teamsAppDefinition_id: str,
-        atodata_type: str,
-        id: Optional[str] = None,
+        self, teamsApp_id: str, teamsAppDefinition_id: str, id: Optional[str] = None
     ) -> Any:
         """
 
@@ -539,7 +523,6 @@ class AppcatalogsApi(APISegmentBase):
         Args:
             teamsApp_id (string): teamsApp-id
             teamsAppDefinition_id (string): teamsAppDefinition-id
-            atodata_type (string): @odata.type
             id (string): The unique identifier for an entity. Read-only.
 
         Returns:
@@ -556,7 +539,7 @@ class AppcatalogsApi(APISegmentBase):
         if teamsAppDefinition_id is None:
             raise ValueError("Missing required parameter 'teamsAppDefinition-id'.")
         request_body_data = None
-        request_body_data = {"id": id, "@odata.type": atodata_type}
+        request_body_data = {"id": id}
         request_body_data = {
             k: v for k, v in request_body_data.items() if v is not None
         }
@@ -627,13 +610,40 @@ class AppcatalogsApi(APISegmentBase):
         response = self._get(url, params=query_params)
         return self._handle_response(response)
 
+    def get_app_catalog_count(
+        self, search: Optional[str] = None, filter: Optional[str] = None
+    ) -> Any:
+        """
+
+        Get the number of the resource
+
+        Args:
+            search (string): Search items by search phrases
+            filter (string): Filter items by property values
+
+        Returns:
+            Any: The count of the resource
+
+        Raises:
+            HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
+
+        Tags:
+            appCatalogs.teamsApp
+        """
+        url = f"{self.main_app_client.base_url}/appCatalogs/teamsApps/$count"
+        query_params = {
+            k: v for k, v in [("$search", search), ("$filter", filter)] if v is not None
+        }
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
+
     def list_tools(self):
         return [
-            self.app_catalogs_list_teams_apps,
-            self.app_catalogs_create_teams_apps,
-            self.app_catalogs_get_teams_apps,
-            self.app_catalogs_update_teams_apps,
-            self.app_catalogs_delete_teams_apps,
+            self.list_teams_apps,
+            self.publish_teams_app,
+            self.get_teams_apps_from_catalogs,
+            self.update_app_catalog_teams_app_by_id,
+            self.delete_teams_app,
             self.get_app_definitions,
             self.create_teams_app_definition,
             self.get_app_definition_by_id,
@@ -643,4 +653,5 @@ class AppcatalogsApi(APISegmentBase):
             self.update_bot_definition,
             self.delete_bot_definition,
             self.count_teams_app_definitions,
+            self.get_app_catalog_count,
         ]
