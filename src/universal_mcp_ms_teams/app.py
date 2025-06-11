@@ -32,7 +32,8 @@ class MsTeamsApp(APIApplication):
         """
         url = f"{self.base_url}/teams"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_team(self, id: Optional[str] = None, classification: Optional[str] = None, createdDateTime: Optional[str] = None, description: Optional[str] = None, displayName: Optional[str] = None, firstChannelName: Optional[str] = None, funSettings: Optional[dict[str, dict[str, Any]]] = None, guestSettings: Optional[dict[str, dict[str, Any]]] = None, internalId: Optional[str] = None, isArchived: Optional[bool] = None, memberSettings: Optional[dict[str, dict[str, Any]]] = None, messagingSettings: Optional[dict[str, dict[str, Any]]] = None, specialization: Optional[str] = None, summary: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, visibility: Optional[str] = None, webUrl: Optional[str] = None, allChannels: Optional[List[Any]] = None, channels: Optional[List[Any]] = None, group: Optional[Any] = None, incomingChannels: Optional[List[Any]] = None, installedApps: Optional[List[Any]] = None, members: Optional[List[Any]] = None, operations: Optional[List[Any]] = None, permissionGrants: Optional[List[Any]] = None, photo: Optional[Any] = None, primaryChannel: Optional[Any] = None, schedule: Optional[Any] = None, tags: Optional[List[Any]] = None, template: Optional[Any] = None) -> Any:
         """
@@ -115,7 +116,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_team_info(self, team_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -139,7 +141,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'team-id'.")
         url = f"{self.base_url}/teams/{team_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_team(self, team_id: str, id: Optional[str] = None, classification: Optional[str] = None, createdDateTime: Optional[str] = None, description: Optional[str] = None, displayName: Optional[str] = None, firstChannelName: Optional[str] = None, funSettings: Optional[dict[str, dict[str, Any]]] = None, guestSettings: Optional[dict[str, dict[str, Any]]] = None, internalId: Optional[str] = None, isArchived: Optional[bool] = None, memberSettings: Optional[dict[str, dict[str, Any]]] = None, messagingSettings: Optional[dict[str, dict[str, Any]]] = None, specialization: Optional[str] = None, summary: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, visibility: Optional[str] = None, webUrl: Optional[str] = None, allChannels: Optional[List[Any]] = None, channels: Optional[List[Any]] = None, group: Optional[Any] = None, incomingChannels: Optional[List[Any]] = None, installedApps: Optional[List[Any]] = None, members: Optional[List[Any]] = None, operations: Optional[List[Any]] = None, permissionGrants: Optional[List[Any]] = None, photo: Optional[Any] = None, primaryChannel: Optional[Any] = None, schedule: Optional[Any] = None, tags: Optional[List[Any]] = None, template: Optional[Any] = None) -> Any:
         """
@@ -225,7 +228,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_team_entity(self, team_id: str) -> Any:
         """
@@ -247,7 +251,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'team-id'.")
         url = f"{self.base_url}/teams/{team_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_channels_for_team(self, team_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -277,7 +282,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'team-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_team_channel(self, team_id: str, id: Optional[str] = None, createdDateTime: Optional[str] = None, description: Optional[str] = None, displayName: Optional[str] = None, email: Optional[str] = None, isArchived: Optional[bool] = None, isFavoriteByDefault: Optional[bool] = None, membershipType: Optional[str] = None, summary: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, webUrl: Optional[str] = None, allMembers: Optional[List[Any]] = None, filesFolder: Optional[Any] = None, members: Optional[List[Any]] = None, messages: Optional[List[Any]] = None, sharedWithTeams: Optional[List[Any]] = None, tabs: Optional[List[Any]] = None) -> Any:
         """
@@ -337,7 +343,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_team_channel_info(self, team_id: str, channel_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -364,7 +371,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_channel(self, team_id: str, channel_id: str, id: Optional[str] = None, createdDateTime: Optional[str] = None, description: Optional[str] = None, displayName: Optional[str] = None, email: Optional[str] = None, isArchived: Optional[bool] = None, isFavoriteByDefault: Optional[bool] = None, membershipType: Optional[str] = None, summary: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, webUrl: Optional[str] = None, allMembers: Optional[List[Any]] = None, filesFolder: Optional[Any] = None, members: Optional[List[Any]] = None, messages: Optional[List[Any]] = None, sharedWithTeams: Optional[List[Any]] = None, tabs: Optional[List[Any]] = None) -> Any:
         """
@@ -427,7 +435,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_channel(self, team_id: str, channel_id: str) -> Any:
         """
@@ -452,7 +461,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def get_team_members_list(self, team_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -482,7 +492,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'team-id'.")
         url = f"{self.base_url}/teams/{team_id}/members"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def add_member_to_team(self, team_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -516,7 +527,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/members"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def list_channel_messages_by_id(self, team_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -549,7 +561,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def send_chat_message(self, team_id: str, channel_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -628,7 +641,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def list_all_team_channel_members(self, team_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -661,7 +675,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/allMembers"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_team_channel_members(self, team_id: str, channel_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -698,7 +713,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/allMembers"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_team_channel_members_details(self, team_id: str, channel_id: str, conversationMember_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -728,7 +744,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_conversation_member_in_team(self, team_id: str, channel_id: str, conversationMember_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -768,7 +785,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_team_channel_member(self, team_id: str, channel_id: str, conversationMember_id: str) -> Any:
         """
@@ -796,7 +814,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_channel_members_by_team_and_channel(self, team_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -829,7 +848,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/members"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def add_member_to_channel_teamwise(self, team_id: str, channel_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -866,7 +886,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/members"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_channel_member(self, team_id: str, channel_id: str, conversationMember_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -896,7 +917,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/members/{conversationMember_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_channel_member_by_id(self, team_id: str, channel_id: str, conversationMember_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -936,7 +958,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/members/{conversationMember_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_conversation_member(self, team_id: str, channel_id: str, conversationMember_id: str) -> Any:
         """
@@ -964,7 +987,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/members/{conversationMember_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def get_chat_message(self, team_id: str, channel_id: str, chatMessage_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -994,7 +1018,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_chat_message_by_team_channel(self, team_id: str, channel_id: str, chatMessage_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -1076,7 +1101,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_team_channel_message(self, team_id: str, channel_id: str, chatMessage_id: str) -> Any:
         """
@@ -1104,7 +1130,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def get_replies(self, team_id: str, channel_id: str, chatMessage_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -1130,7 +1157,7 @@ class MsTeamsApp(APIApplication):
             HTTPStatusError: Raised when the API request fails with detailed error information including status code and response body.
 
         Tags:
-            teams.channel
+            teams.channel, important
         """
         if team_id is None:
             raise ValueError("Missing required parameter 'team-id'.")
@@ -1140,7 +1167,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_channel_message_reply(self, team_id: str, channel_id: str, chatMessage_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -1222,7 +1250,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_chat_message_reply(self, team_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -1255,7 +1284,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_message_reply(self, team_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -1340,7 +1370,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_team_channel_message_reply(self, team_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str) -> Any:
         """
@@ -1371,7 +1402,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_channel_shared_teams(self, team_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -1404,7 +1436,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def share_channel_with_team(self, team_id: str, channel_id: str, id: Optional[str] = None, displayName: Optional[str] = None, tenantId: Optional[str] = None, team: Optional[Any] = None, isHostTeam: Optional[bool] = None, allowedMembers: Optional[List[Any]] = None) -> Any:
         """
@@ -1445,7 +1478,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_shared_teams_channels_info(self, team_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -1475,7 +1509,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'sharedWithChannelTeamInfo-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_shared_with_team_info(self, team_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str, id: Optional[str] = None, displayName: Optional[str] = None, tenantId: Optional[str] = None, team: Optional[Any] = None, isHostTeam: Optional[bool] = None, allowedMembers: Optional[List[Any]] = None) -> Any:
         """
@@ -1519,7 +1554,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_shared_team_channel_link(self, team_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str) -> Any:
         """
@@ -1547,7 +1583,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'sharedWithChannelTeamInfo-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_channel_allowed_members(self, team_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -1583,7 +1620,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'sharedWithChannelTeamInfo-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def get_channel_allowed_member_by_id(self, team_id: str, channel_id: str, sharedWithChannelTeamInfo_id: str, conversationMember_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -1616,7 +1654,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/teams/{team_id}/channels/{channel_id}/sharedWithTeams/{sharedWithChannelTeamInfo_id}/allowedMembers/{conversationMember_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def list_chats(self, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -1643,7 +1682,8 @@ class MsTeamsApp(APIApplication):
         """
         url = f"{self.base_url}/chats"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_chat_operation(self, id: Optional[str] = None, chatType: Optional[str] = None, createdDateTime: Optional[str] = None, isHiddenForAllMembers: Optional[bool] = None, lastUpdatedDateTime: Optional[str] = None, onlineMeetingInfo: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, topic: Optional[str] = None, viewpoint: Optional[dict[str, dict[str, Any]]] = None, webUrl: Optional[str] = None, installedApps: Optional[List[Any]] = None, lastMessagePreview: Optional[Any] = None, members: Optional[List[Any]] = None, messages: Optional[List[Any]] = None, permissionGrants: Optional[List[Any]] = None, pinnedMessages: Optional[List[Any]] = None, tabs: Optional[List[Any]] = None) -> Any:
         """
@@ -1700,7 +1740,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_chat(self, chat_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -1724,7 +1765,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chat-id'.")
         url = f"{self.base_url}/chats/{chat_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_chat_details(self, chat_id: str, id: Optional[str] = None, chatType: Optional[str] = None, createdDateTime: Optional[str] = None, isHiddenForAllMembers: Optional[bool] = None, lastUpdatedDateTime: Optional[str] = None, onlineMeetingInfo: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, topic: Optional[str] = None, viewpoint: Optional[dict[str, dict[str, Any]]] = None, webUrl: Optional[str] = None, installedApps: Optional[List[Any]] = None, lastMessagePreview: Optional[Any] = None, members: Optional[List[Any]] = None, messages: Optional[List[Any]] = None, permissionGrants: Optional[List[Any]] = None, pinnedMessages: Optional[List[Any]] = None, tabs: Optional[List[Any]] = None) -> Any:
         """
@@ -1784,7 +1826,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_chat_by_id(self, chat_id: str) -> Any:
         """
@@ -1806,7 +1849,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chat-id'.")
         url = f"{self.base_url}/chats/{chat_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_chat_members(self, chat_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -1836,7 +1880,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chat-id'.")
         url = f"{self.base_url}/chats/{chat_id}/members"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def add_member_to_chat(self, chat_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -1870,7 +1915,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}/members"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_conversation_member(self, chat_id: str, conversationMember_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -1897,7 +1943,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/chats/{chat_id}/members/{conversationMember_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_chat_member(self, chat_id: str, conversationMember_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -1934,7 +1981,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}/members/{conversationMember_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def remove_conversation_member(self, chat_id: str, conversationMember_id: str) -> Any:
         """
@@ -1959,7 +2007,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/chats/{chat_id}/members/{conversationMember_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_chat_messages(self, chat_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -1989,7 +2038,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chat-id'.")
         url = f"{self.base_url}/chats/{chat_id}/messages"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def post_chat_message(self, chat_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -2065,7 +2115,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}/messages"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_chat_message_detail(self, chat_id: str, chatMessage_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -2092,7 +2143,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_chat_messages(self, chat_id: str, chatMessage_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -2171,7 +2223,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_chat_messages(self, chat_id: str, chatMessage_id: str) -> Any:
         """
@@ -2196,7 +2249,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def read_chat_replies(self, chat_id: str, chatMessage_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -2229,7 +2283,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_chat_reply(self, chat_id: str, chatMessage_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -2308,7 +2363,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_chat_replies(self, chat_id: str, chatMessage_id: str, chatMessage_id1: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -2338,7 +2394,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_chat_replies(self, chat_id: str, chatMessage_id: str, chatMessage_id1: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -2420,7 +2477,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_chat_reply(self, chat_id: str, chatMessage_id: str, chatMessage_id1: str) -> Any:
         """
@@ -2448,7 +2506,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         url = f"{self.base_url}/chats/{chat_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def get_group_team(self, group_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -2472,7 +2531,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'group-id'.")
         url = f"{self.base_url}/groups/{group_id}/team"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_team_from_group(self, group_id: str, id: Optional[str] = None, classification: Optional[str] = None, createdDateTime: Optional[str] = None, description: Optional[str] = None, displayName: Optional[str] = None, firstChannelName: Optional[str] = None, funSettings: Optional[dict[str, dict[str, Any]]] = None, guestSettings: Optional[dict[str, dict[str, Any]]] = None, internalId: Optional[str] = None, isArchived: Optional[bool] = None, memberSettings: Optional[dict[str, dict[str, Any]]] = None, messagingSettings: Optional[dict[str, dict[str, Any]]] = None, specialization: Optional[str] = None, summary: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, visibility: Optional[str] = None, webUrl: Optional[str] = None, allChannels: Optional[List[Any]] = None, channels: Optional[List[Any]] = None, group: Optional[Any] = None, incomingChannels: Optional[List[Any]] = None, installedApps: Optional[List[Any]] = None, members: Optional[List[Any]] = None, operations: Optional[List[Any]] = None, permissionGrants: Optional[List[Any]] = None, photo: Optional[Any] = None, primaryChannel: Optional[Any] = None, schedule: Optional[Any] = None, tags: Optional[List[Any]] = None, template: Optional[Any] = None) -> Any:
         """
@@ -2558,7 +2618,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team"
         query_params = {}
-        return self._put_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._put(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def delete_group_team(self, group_id: str) -> Any:
         """
@@ -2580,7 +2641,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'group-id'.")
         url = f"{self.base_url}/groups/{group_id}/team"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def fetch_groups_team_all_channels(self, group_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -2610,7 +2672,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'group-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/allChannels"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def get_group_team_all_channels(self, group_id: str, channel_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -2637,7 +2700,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/allChannels/{channel_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def get_group_channels(self, group_id: str, channel_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -2664,7 +2728,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_group_channels(self, group_id: str, channel_id: str, id: Optional[str] = None, createdDateTime: Optional[str] = None, description: Optional[str] = None, displayName: Optional[str] = None, email: Optional[str] = None, isArchived: Optional[bool] = None, isFavoriteByDefault: Optional[bool] = None, membershipType: Optional[str] = None, summary: Optional[dict[str, dict[str, Any]]] = None, tenantId: Optional[str] = None, webUrl: Optional[str] = None, allMembers: Optional[List[Any]] = None, filesFolder: Optional[Any] = None, members: Optional[List[Any]] = None, messages: Optional[List[Any]] = None, sharedWithTeams: Optional[List[Any]] = None, tabs: Optional[List[Any]] = None) -> Any:
         """
@@ -2727,7 +2792,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_group_channel(self, group_id: str, channel_id: str) -> Any:
         """
@@ -2752,9 +2818,10 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
-    def list_channel_members_by_groupid_channelid(self, group_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
+    def list_channel_members(self, group_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
         Get allMembers from groups
 
@@ -2785,7 +2852,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_group_team_channel(self, group_id: str, channel_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -2822,7 +2890,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_channel_member_details(self, group_id: str, channel_id: str, conversationMember_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -2852,7 +2921,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_group_team_channel_member(self, group_id: str, channel_id: str, conversationMember_id: str, id: Optional[str] = None, displayName: Optional[str] = None, roles: Optional[List[str]] = None, visibleHistoryStartDateTime: Optional[str] = None) -> Any:
         """
@@ -2892,7 +2962,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_group_channel_member(self, group_id: str, channel_id: str, conversationMember_id: str) -> Any:
         """
@@ -2920,7 +2991,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'conversationMember-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/allMembers/{conversationMember_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def get_group_messages(self, group_id: str, channel_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -2953,7 +3025,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'channel-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_group_channel_message(self, group_id: str, channel_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -3032,7 +3105,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_group_channel_messages(self, group_id: str, channel_id: str, chatMessage_id: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -3062,7 +3136,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_message(self, group_id: str, channel_id: str, chatMessage_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -3144,7 +3219,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
     def delete_message_in_channel(self, group_id: str, channel_id: str, chatMessage_id: str) -> Any:
         """
@@ -3172,7 +3248,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def get_chat_message_replies(self, group_id: str, channel_id: str, chatMessage_id: str, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
         """
@@ -3208,7 +3285,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies"
         query_params = {k: v for k, v in [('$top', top), ('$skip', skip), ('$search', search), ('$filter', filter), ('$count', count), ('$orderby', orderby), ('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def create_reply_in_message(self, group_id: str, channel_id: str, chatMessage_id: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -3290,7 +3368,8 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies"
         query_params = {}
-        return self._post_json(url, data=request_body_data, params=query_params, content_type='application/json')
+        response = self._post(url, data=request_body_data, params=query_params, content_type='application/json')
+        return self._handle_response(response)
 
     def get_reply_messages(self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> Any:
         """
@@ -3323,7 +3402,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {k: v for k, v in [('$select', select), ('$expand', expand)] if v is not None}
-        return self._get_json(url, params=query_params)
+        response = self._get(url, params=query_params)
+        return self._handle_response(response)
 
     def update_reply_message(self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str, id: Optional[str] = None, attachments: Optional[List[dict[str, dict[str, Any]]]] = None, body: Optional[dict[str, dict[str, Any]]] = None, channelIdentity: Optional[dict[str, dict[str, Any]]] = None, chatId: Optional[str] = None, createdDateTime: Optional[str] = None, deletedDateTime: Optional[str] = None, etag: Optional[str] = None, eventDetail: Optional[dict[str, dict[str, Any]]] = None, from_: Optional[Any] = None, importance: Optional[str] = None, lastEditedDateTime: Optional[str] = None, lastModifiedDateTime: Optional[str] = None, locale: Optional[str] = None, mentions: Optional[List[dict[str, dict[str, Any]]]] = None, messageHistory: Optional[List[dict[str, dict[str, Any]]]] = None, messageType: Optional[str] = None, policyViolation: Optional[dict[str, dict[str, Any]]] = None, reactions: Optional[List[dict[str, dict[str, Any]]]] = None, replyToId: Optional[str] = None, subject: Optional[str] = None, summary: Optional[str] = None, webUrl: Optional[str] = None, hostedContents: Optional[List[Any]] = None, replies: Optional[List[Any]] = None) -> Any:
         """
@@ -3408,9 +3488,10 @@ class MsTeamsApp(APIApplication):
         request_body_data = {k: v for k, v in request_body_data.items() if v is not None}
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
-        return self._patch_json(url, data=request_body_data, params=query_params)
+        response = self._patch(url, data=request_body_data, params=query_params)
+        return self._handle_response(response)
 
-    def delete_channel_message_reply(self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str) -> Any:
+    def delete_channel_message(self, group_id: str, channel_id: str, chatMessage_id: str, chatMessage_id1: str) -> Any:
         """
         Delete navigation property replies for groups
 
@@ -3439,7 +3520,8 @@ class MsTeamsApp(APIApplication):
             raise ValueError("Missing required parameter 'chatMessage-id1'.")
         url = f"{self.base_url}/groups/{group_id}/team/channels/{channel_id}/messages/{chatMessage_id}/replies/{chatMessage_id1}"
         query_params = {}
-        return self._delete_json(url, params=query_params)
+        response = self._delete(url, params=query_params)
+        return self._handle_response(response)
 
     def list_tools(self):
         return [
@@ -3510,7 +3592,7 @@ class MsTeamsApp(APIApplication):
             self.get_group_channels,
             self.update_group_channels,
             self.delete_group_channel,
-            self.list_channel_members_by_groupid_channelid,
+            self.list_channel_members,
             self.create_group_team_channel,
             self.get_channel_member_details,
             self.update_group_team_channel_member,
@@ -3524,5 +3606,5 @@ class MsTeamsApp(APIApplication):
             self.create_reply_in_message,
             self.get_reply_messages,
             self.update_reply_message,
-            self.delete_channel_message_reply
+            self.delete_channel_message
         ]

@@ -2090,7 +2090,7 @@ wheels = [
 
 [[package]]
 name = "universal-mcp"
-version = "0.1.22"
+version = "0.1.23"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "black" },
@@ -2110,14 +2110,14 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/97/bf/0e043e2587a4db51d91a77605cf9b034e44b473d24d47fb0fba8197b2052/universal_mcp-0.1.22.tar.gz", hash = "sha256:314e07e1afd25158327870a6bc6d47481a3fdac2a3409c68f73da6b2288cb7c7", size = 78508, upload-time = "2025-06-01T15:55:10.757Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/40/68/fdf678c7f03b8938167c84a9cab23f9cb903b0858bf2f3d5aa45b1167919/universal_mcp-0.1.23.tar.gz", hash = "sha256:57d1a86e5e51777d237842c0199686dedf55e53df32ff6d822a334ad9ca930c9", size = 86535, upload-time = "2025-06-08T21:22:26.845Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/35/14ba3d84c7a1822d46ca6ef8f1680cfabc6c095bee1e355b9d0458daf670/universal_mcp-0.1.22-py3-none-any.whl", hash = "sha256:4e9c0227f100e1cc0ab7792e8cce5f8a9cc226fed8571bb2d29089740dfae7d9", size = 89067, upload-time = "2025-06-01T15:55:09.475Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/c3/025a0008531d702a8610244c2bb7f6c8c55b88d596e0f7656674b4b67a52/universal_mcp-0.1.23-py3-none-any.whl", hash = "sha256:0a73cc2860d3d13e207adf4b58f7c94b83feb4c0be6afa581de82886d1bbb0c5", size = 97900, upload-time = "2025-06-08T21:22:25.109Z" },
 ]
 
 [[package]]
 name = "universal-mcp-ms-teams"
-version = "0.1.5"
+version = "0.1.6"
 source = { editable = "." }
 dependencies = [
     { name = "universal-mcp" },
@@ -2139,7 +2139,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0.0,<9.0.0" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'dev'" },
-    { name = "universal-mcp", specifier = "==0.1.22" },
+    { name = "universal-mcp", specifier = ">=0.1.23" },
 ]
 provides-extras = ["test", "dev"]
 
