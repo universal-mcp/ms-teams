@@ -76,7 +76,7 @@ This is automatically generated from OpenAPI schema for the MsTeamsApp API.
 | `get_group_channels` | Get channels from groups |
 | `update_group_channels` | Update the navigation property channels in groups |
 | `delete_group_channel` | Delete navigation property channels for groups |
-| `list_channel_members_by_groupid_channelid` | Get allMembers from groups |
+| `list_channel_members` | Get allMembers from groups |
 | `create_group_team_channel` | Create new navigation property to allMembers for groups |
 | `get_channel_member_details` | Get allMembers from groups |
 | `update_group_team_channel_member` | Update the navigation property allMembers in groups |
@@ -90,4 +90,4 @@ This is automatically generated from OpenAPI schema for the MsTeamsApp API.
 | `create_reply_in_message` | Create new navigation property to replies for groups |
 | `get_reply_messages` | Get replies from groups |
 | `update_reply_message` | Update the navigation property replies in groups |
-| `delete_channel_message_reply` | Delete navigation property replies for groups |
+| `delete_channel_message` | Delete navigation property replies for groups |
