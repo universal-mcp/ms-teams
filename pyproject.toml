@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "universal-mcp-ms-teams"
-version = "0.1.7"
+version = "0.1.8"
 description = "A Universal MCP Application: universal_mcp_ms_teams"
 readme = "README.md"
 requires-python = ">=3.11"
