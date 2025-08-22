@@ -4,7 +4,7 @@ from universal_mcp.integrations import Integration
 
 class MsTeamsApp(APIApplication):
     def __init__(self, integration: Integration = None, **kwargs) -> None:
-        super().__init__(name='ms-teams', integration=integration, **kwargs)
+        super().__init__(name='microsoft-teams', integration=integration, **kwargs)
         self.base_url = "https://graph.microsoft.com/v1.0"
 
     def list_chats(self, top: Optional[int] = None, skip: Optional[int] = None, search: Optional[str] = None, filter: Optional[str] = None, count: Optional[bool] = None, orderby: Optional[List[str]] = None, select: Optional[List[str]] = None, expand: Optional[List[str]] = None) -> dict[str, Any]:
